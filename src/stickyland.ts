@@ -63,12 +63,12 @@ export class StickyLand {
     // Allow users to drag to resize
     this.enableResize();
 
-    // Register the drag-and-drop events
-    this.node.addEventListener(
-      'lm-drop',
-      e => this.dragDropHandler(e as IDragEvent),
-      true
-    );
+    // // Register the drag-and-drop events
+    // this.node.addEventListener(
+    //   'lm-drop',
+    //   e => this.dragDropHandler(e as IDragEvent),
+    //   true
+    // );
 
     this.node.addEventListener(
       'lm-dragenter',
@@ -247,15 +247,15 @@ export class StickyLand {
    *
    * @param event Lumino IDragEVent
    */
-  dragDropHandler = (event: IDragEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
+  // dragDropHandler = (event: IDragEvent) => {
+  //   event.preventDefault();
+  //   event.stopPropagation();
 
-    // Let the content handle drag drop
-    if (this.stickyContent) {
-      this.stickyContent.dragDropHandler(event);
-    }
-  };
+  //   // Let the content handle drag drop
+  //   if (this.stickyContent) {
+  //     this.stickyContent.dragDropHandler(event);
+  //   }
+  // };
 
   /**
    * Handle drag enter event

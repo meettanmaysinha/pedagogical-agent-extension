@@ -1,4 +1,4 @@
-.dropzone {
+.agent {
   font-size: 1.5em;
   font-weight: 400;
 
@@ -15,11 +15,11 @@
   transition: border 300ms ease-in-out;
 }
 
-.dropzone.drag-over {
+.agent.drag-over {
   border: 3px dashed var(--md-blue-400);
 }
 
-.dropzone .dropzone-label {
+.agent .chat-label {
   text-align: center;
   margin: 10px 10px 30px 10px;
   color: var(--jp-inverse-layout-color3);
@@ -27,38 +27,46 @@
   pointer-events: none;
 }
 
-.dropzone .svg-icon {
+.agent .svg-icon {
   width: 2em;
   height: 2em;
   fill: var(--jp-border-color0);
   pointer-events: none;
 }
 
-.dropzone-bottom-container {
+.agent-bottom-container {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 60%;
   gap: 5px;
 }
 
-.dropzone-bottom-container .button {
+.agent-bottom-container .button {
+  display: flex;
   border: 1px solid var(--jp-border-color2);
   height: 22px;
+  align-self: center;
 }
 
-.dropzone-select-container {
+.agent-chat-container {
+  display: flex;
   position: relative;
+  width: 100%;
 }
 
-.dropzone-select-container span {
+.agent-chat-container span {
+  display: flex;
   top: 0px;
-  right: 5px;
+  right: 0px;
   position: absolute;
+  width: 100%;
   pointer-events: none;
 }
 
-/* Use a slightly modified select style from jupyter lab toolbar */
-.dropzone-select-container select {
+/* Use a slightly modified input style */
+.agent-chat-container input {
+  display: flex;
   background-color: var(--jp-layout-color1);
   border: 1px solid var(--jp-border-color2);
   border-radius: 0.375em;
@@ -66,19 +74,14 @@
   color: var(--jp-ui-font-color0);
   display: block;
   font-size: var(--jp-ui-font-size1);
-  height: 24px;
+  height: 22px;
+  width: 100%;
   line-height: 14px;
-  padding: 0 25px 0 10px;
+  padding: 0 10px 0 10px;
   text-align: left;
-  cursor: pointer;
-  -moz-appearance: none;
-  -webkit-appearance: none;
+  justify-self: left;
 }
 
-.dropzone-select-container select:hover {
-  border-color: var(--jp-border-color0);
-}
-
-.dropzone-select-container select:active {
+.agent-chat-container input:hover {
   border-color: var(--jp-border-color0);
 }

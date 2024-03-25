@@ -154,11 +154,11 @@ export class StickyContent implements IDisposable {
    * Handle drop leave according to the current content type
    * @param event Lumino IDragEvent
    */
-  dragDropHandler = (event: IDragEvent) => {
-    if (this.curContent instanceof Dropzone) {
-      this.curContent.dragDropHandler(event);
-    }
-  };
+  // dragDropHandler = (event: IDragEvent) => {
+  //   if (this.curContent instanceof Dropzone) {
+  //     this.curContent.dragDropHandler(event);
+  //   }
+  // };
 
   /**
    * Handle drag leave according to the current content type
