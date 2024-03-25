@@ -14,7 +14,8 @@ export class Dropzone implements IDisposable {
   node: HTMLElement;
   doseReceiveDrop: boolean;
   isDisposed = false;
-  chatInput: HTMLInputElement;
+  chatBox: HTMLElement;
+  chatInput: HTMLTextAreaElement;
   chatButton: HTMLButtonElement;
   static numDz = 0;
 
@@ -27,23 +28,39 @@ export class Dropzone implements IDisposable {
     this.node.classList.add('agent');
     this.stickyContent.contentNode.append(this.node);
 
-    // Initialize the content
+    // Add a chat box
+    this.chatBox = document.createElement('span') as HTMLElement;
+    this.chatBox.classList.add('agent-chat-box');
+    this.node.append(this.chatBox);
 
-    // Add an icon
-    const addIconElem = document.createElement('div');
-    addIconElem.classList.add('svg-icon');
-    this.node.append(addIconElem);
+    if (this.node.getElementsByClassName('agent-chat-box').length === 0) {
+      // Initialize the content
 
-    MyIcons.addIcon.element({ container: addIconElem });
+      // Add an icon
+      const addIconElem = document.createElement('div');
+      addIconElem.classList.add('svg-icon');
+      this.node.append(addIconElem);
 
-    // Add a text label
-    const label = document.createElement('span');
-    label.classList.add('chat-label');
-    label.innerText = 'Ask me questions!';
-    this.node.append(label);
+      MyIcons.addIcon.element({ container: addIconElem });
+
+      // Add a text label
+      const label = document.createElement('span');
+      label.classList.add('chat-label');
+      label.innerText = 'Ask me questions!';
+      this.node.append(label);
+    }
+    // else {
+    //   // // Add chat messages
+    //   // for (let i = 0; i < 10; i++) {
+    //   //   const chatMessage = document.createElement('div');
+    //   //   chatMessage.classList.add('chat-message');
+    //   //   chatMessage.innerText = `Chat Message ${i}`;
+    //   //   this.chatBox.append(chatMessage);
+    //   // }
+    // }
 
     // Add bottom container
-    const bottomContainer = document.createElement('div');
+    const bottomContainer = document.createElement('span');
     bottomContainer.classList.add('agent-bottom-container');
     this.node.append(bottomContainer);
 
@@ -52,9 +69,14 @@ export class Dropzone implements IDisposable {
     chatContainer.classList.add('agent-chat-container');
     bottomContainer.append(chatContainer);
 
-    this.chatInput = document.createElement('input') as HTMLInputElement;
+    this.chatInput = document.createElement('textarea') as HTMLTextAreaElement;
     this.chatInput.classList.add('agent-chat-input');
     chatContainer.append(this.chatInput);
+    // Auto resize textarea based on content
+    this.chatInput.addEventListener('input', function () {
+      this.style.height = '22px';
+      this.style.height = this.scrollHeight + 'px';
+    });
 
     // // Add a small caret down icon (from jp)
     // const chatIcon = document.createElement('span');
@@ -67,9 +89,9 @@ export class Dropzone implements IDisposable {
     this.chatButton.classList.add('agent-button', 'button');
     bottomContainer.append(this.chatButton);
     this.chatButton.type = 'button';
-    this.chatButton.innerText = 'Ask';
-    this.chatButton.addEventListener('click', this.createClickHandler);
-
+    this.chatButton.innerText = 'Send';
+    this.chatButton.addEventListener('click', this.buttonClickHandler);
+    this.chatInput.addEventListener('keydown', this.enterKeyHandler);
     // // Add options to the select list
     // const newCellOptions = [
     //   { name: 'Select new cell type', type: ContentType.Dropzone },
@@ -150,12 +172,52 @@ export class Dropzone implements IDisposable {
     // pass
   };
 
+  // Adds a new message to the chat box, depending on role
+  addMessageHandler = (role: string, message: string) => {
+    const chatMessage = document.createElement('div');
+    const chatRole = document.createElement('div');
+    chatMessage.classList.add('chat-message');
+    if (role === 'system') {
+      chatRole.classList.add('system-role');
+      chatRole.innerText = 'System';
+    } else if (role === 'user') {
+      chatRole.classList.add('user-role');
+      chatRole.innerText = 'You';
+    }
+    chatMessage.innerText = message;
+    this.chatBox.append(chatRole);
+    this.chatBox.append(chatMessage);
+  };
+
   /**
-   * Handle mouse click on the create button
+   * Handle keyboard enter in the chat input
+   * @param event Keyboard press event
+   */
+  enterKeyHandler = (event: KeyboardEvent) => {
+    // Check for enter key
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault(); // Prevent line break
+      // Get the message from the input box and add to chat box
+      const message = this.chatInput.value;
+      this.chatInput.value = '';
+      this.chatInput.style.height = ''; // Return input box to original size
+      this.addMessageHandler('user', message);
+      this.chatBox.scrollTop = this.chatBox.scrollHeight; // Scroll to the bottom
+    }
+  };
+
+  /**
+   * Handle mouse click on the send button
    * @param event Mouse movement event
    */
-  createClickHandler = (event: MouseEvent) => {
-    console.log('Chat Button Clicked');
+  buttonClickHandler = (event: MouseEvent) => {
+    // Get the message from the input box and add to chat box
+    const message = this.chatInput.value;
+    this.chatInput.value = '';
+    this.chatInput.style.height = ''; // Return input box to original size
+    this.addMessageHandler('user', message);
+    this.chatBox.scrollTop = this.chatBox.scrollHeight; // Scroll to the bottom
+
     // Query the current value of the cell type dropdown
     // const curOption = <ContentType>this.select.value;
     // switch (curOption) {
