@@ -3,7 +3,6 @@ import { NotebookActions } from '@jupyterlab/notebook';
 import { NotebookPanel, Notebook } from '@jupyterlab/notebook';
 import { Cell, ICellModel } from '@jupyterlab/cells';
 import { StickyContent } from './content';
-import { StickyCode } from './code';
 import { StickyLand } from './stickyland';
 import { ContentType } from './content';
 import { MyIcons } from './icons';
@@ -27,7 +26,6 @@ export class StickyTab implements IDisposable {
 
   autoRunTimeout: number | null = null;
   autoRunningCellNodes: Set<HTMLElement> = new Set([]);
-  autoRunCells = new Array<StickyCode>();
   autoRunTabs = new Array<Tab>();
   isDisposed = false;
 
@@ -90,18 +88,7 @@ export class StickyTab implements IDisposable {
     }
 
     // Get all the code cells that have auto-run turned on
-    const autoRunCells = new Array<StickyCode>();
     const autoRunTabs = new Array<Tab>();
-
-    this.tabs.forEach(d => {
-      if (d.cellType === ContentType.Code) {
-        const curContent = d.tabContent.curContent as StickyCode;
-        if (curContent.autoRun) {
-          autoRunCells.push(curContent);
-          autoRunTabs.push(d);
-        }
-      }
-    });
 
     // We need to set a timeout to workaround the current executionScheduled
     // emit order
@@ -113,35 +100,6 @@ export class StickyTab implements IDisposable {
     if (this.autoRunTimeout !== null) {
       clearTimeout(this.autoRunTimeout);
     }
-
-    this.autoRunTimeout = setTimeout(() => {
-      // Run the auto-run code cells
-      const toRunCells = new Array<StickyCode>();
-
-      autoRunCells.forEach(d => {
-        // If the signal source is the cell itself, we mark it as autoRunScheduled
-        // so we won't run it again after its peers finish running
-        if (d.originalCell.node === args.cell.node) {
-          d.autoRunScheduled = true;
-        } else {
-          if (!d.autoRunScheduled) {
-            d.autoRunScheduled = true;
-
-            // d.execute returns a promise but the promise can be fulfilled before
-            // the cell is executed, so we manually keep a record of all running
-            // cells and resolve them manually
-            toRunCells.push(d);
-            this.autoRunningCellNodes.add(d.originalCell.node);
-          }
-        }
-      });
-
-      toRunCells.forEach(d => d.execute(true));
-
-      // Move the local autoRunCells/autoRunTabs to object level
-      this.autoRunCells = autoRunCells;
-      this.autoRunTabs = autoRunTabs;
-    }, 200);
   };
 
   /**
@@ -158,25 +116,6 @@ export class StickyTab implements IDisposable {
     if (this.autoRunningCellNodes.has(args.cell.node)) {
       // Remove watching this cell
       this.autoRunningCellNodes.delete(args.cell.node);
-
-      // If all auto-running cells finish running, we allow all these cells to
-      // be auto-run again in the future
-      if (this.autoRunningCellNodes.size === 0) {
-        this.autoRunCells.forEach(d => {
-          d.autoRunScheduled = false;
-        });
-
-        // Also mark the tab to indicate there is new update in this tab
-        this.autoRunTabs.forEach(d => {
-          // const curCell = d.tabContent.curContent as StickyCode;
-          if (!d.tabNode.classList.contains('current')) {
-            d.tabNode.classList.add('new-update');
-          }
-        });
-
-        this.autoRunCells = [];
-        this.autoRunTabs = [];
-      }
     }
   };
 
@@ -314,48 +253,8 @@ export class StickyTab implements IDisposable {
     if (this.activeTab) {
       const newContent = this.activeTab?.tabContent.curContent;
 
-      // Find the new content type
-      let newCellType = ContentType.Dropzone;
-      if (newContent instanceof StickyCode) {
-        newCellType = ContentType.Code;
-      }
-
-      // Find the new cell index
-      let newCellIndex = 1;
-      this.tabs.forEach(d => {
-        if (d.cellType === newCellType) {
-          newCellIndex++;
-        }
-      });
-
       // Update the tab name
       const tabLabel = this.activeTab.tabNode.querySelector('.tab-label');
-
-      if (tabLabel) {
-        switch (newCellType) {
-          case ContentType.Code:
-            tabLabel.innerHTML = `Code-${newCellIndex}`;
-            this.activeTab.tabNode.setAttribute(
-              'title',
-              `Code-${newCellIndex}`
-            );
-            this.activeTab.tabNode.classList.remove('new-tab');
-            break;
-
-          case ContentType.Dropzone:
-            tabLabel.innerHTML = 'New';
-            this.activeTab.tabNode.setAttribute('title', 'New tab');
-            this.activeTab.tabNode.classList.add('new-tab');
-            break;
-
-          default:
-            break;
-        }
-      }
-
-      // Update the model data
-      this.activeTab.cellIndex = newCellIndex;
-      this.activeTab.cellType = newCellType;
     }
   };
 

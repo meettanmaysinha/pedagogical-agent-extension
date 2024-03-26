@@ -1,9 +1,9 @@
 import { IDisposable } from '@lumino/disposable';
 import { ContentType } from './content';
-import { StickyCode } from './code';
 import { StickyTab, Tab } from './tab';
 import { StickyLand } from './stickyland';
 import { MyIcons } from './icons';
+import { Dropzone } from './dropzone';
 
 type Position = {
   x: number;
@@ -26,7 +26,7 @@ export class FloatingWindow implements IDisposable {
   container: HTMLElement | null;
   containerSize: Size;
   node: HTMLElement;
-  stickyCell: StickyCode;
+  stickyCell: Dropzone;
   stickyTab: StickyTab;
   stickyLand: StickyLand;
   tab: Tab | null;
@@ -40,7 +40,7 @@ export class FloatingWindow implements IDisposable {
   startPos: Position | null = null;
   endPos: Position | null = null;
 
-  constructor(cellType: ContentType, stickyCell: StickyCode) {
+  constructor(cellType: ContentType, stickyCell: Dropzone) {
     // Create the floating window element
     this.node = document.createElement('div');
     this.node.classList.add('floating-window', 'hidden');
@@ -83,8 +83,7 @@ export class FloatingWindow implements IDisposable {
     this.stickyLand = this.stickyCell.stickyContent.stickyLand;
 
     // We first put the cell on the left edge of the notebook panel
-    const initLeft =
-      this.stickyCell.notebook.node.getBoundingClientRect().x + 10;
+    const initLeft = this.stickyCell.node.getBoundingClientRect().x + 10;
 
     // Position the node to the inner region and offset it a little bit when
     // users create multiple windows
@@ -408,8 +407,6 @@ export class FloatingWindow implements IDisposable {
       windowIndex,
       1
     );
-
-    this.stickyCell.isFloating = false;
   };
 
   /**

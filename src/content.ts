@@ -4,7 +4,6 @@ import { NotebookPanel } from '@jupyterlab/notebook';
 import { CodeCell, MarkdownCell, Cell } from '@jupyterlab/cells';
 
 import { Dropzone } from './dropzone';
-import { StickyCode } from './code';
 import { StickyLand } from './stickyland';
 
 export enum ContentType {
@@ -18,7 +17,7 @@ export class StickyContent implements IDisposable {
   wrapperNode: HTMLElement;
   headerNode: HTMLElement;
   contentNode: HTMLElement;
-  curContent: Dropzone | StickyCode;
+  curContent: Dropzone;
   notebook: NotebookPanel;
   stickyLand: StickyLand;
   isDisposed = false;
@@ -59,57 +58,6 @@ export class StickyContent implements IDisposable {
     // It only happens when the user closes the last sticky code/md cell
     // Dehighlight the tab name
     this.stickyLand.stickyTab.activeTab?.tabNode.classList.remove('new-update');
-  };
-
-  /**
-   * Replace the dropzone content with a clone of an existing cell
-   * @param cell Existing cell that the users drag over
-   * @param newCellType Cell type of the current cell
-   */
-  swapDropzoneWithExistingCell = (cell: Cell, newCellType: ContentType) => {
-    // Remove the dropzone
-    this.curContent.dispose();
-
-    // Add a new cell
-    switch (newCellType) {
-      case ContentType.Code:
-        // Initialize a code cell
-        this.curContent = StickyCode.createFromExistingCell(
-          this,
-          cell as CodeCell,
-          this.notebook
-        );
-        break;
-
-      default:
-        break;
-    }
-
-    // Notify the tab to update tab name
-    this.stickyLand.stickyTab.updateActiveTab();
-  };
-
-  /**
-   * Replace the dropzone content with a new cell. This operation will append a
-   * new cell to the main notebook.
-   * @param newCellType New cell type
-   */
-  swapDropzoneWithNewCell = (newCellType: ContentType) => {
-    switch (newCellType) {
-      case ContentType.Code:
-        // Remove the dropzone
-        this.curContent.dispose();
-
-        // Initialize a new code cell
-        this.curContent = StickyCode.createFromNewCell(this, this.notebook);
-        break;
-
-      default:
-        break;
-    }
-
-    // Notify the tab to update tab name
-    this.stickyLand.stickyTab.updateActiveTab();
   };
 
   swapToDropzone = () => {
