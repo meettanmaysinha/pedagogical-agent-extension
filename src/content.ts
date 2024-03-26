@@ -130,46 +130,6 @@ export class StickyContent implements IDisposable {
     this.stickyLand.stickyTab.updateActiveTab();
   };
 
-  /**
-   * Handle drag enter according to the current content type
-   * @param event Lumino IDragEvent
-   */
-  dragEnterHandler = (event: IDragEvent) => {
-    if (this.curContent instanceof Dropzone) {
-      this.curContent.dragEnterHandler(event);
-    }
-  };
-
-  /**
-   * Handle drag over according to the current content type
-   * @param event Lumino IDragEvent
-   */
-  dragOverHandler = (event: IDragEvent) => {
-    if (this.curContent instanceof Dropzone) {
-      this.curContent.dragOverHandler(event);
-    }
-  };
-
-  /**
-   * Handle drop leave according to the current content type
-   * @param event Lumino IDragEvent
-   */
-  // dragDropHandler = (event: IDragEvent) => {
-  //   if (this.curContent instanceof Dropzone) {
-  //     this.curContent.dragDropHandler(event);
-  //   }
-  // };
-
-  /**
-   * Handle drag leave according to the current content type
-   * @param event Lumino IDragEvent
-   */
-  dragLeaveHandler = (event: IDragEvent) => {
-    if (this.curContent instanceof Dropzone) {
-      this.curContent.dragLeaveHandler(event);
-    }
-  };
-
   swapToDropzone = () => {
     // Dispose the current content
     this.curContent.closeClicked();

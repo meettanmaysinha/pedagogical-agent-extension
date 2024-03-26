@@ -107,27 +107,6 @@ export class Dropzone implements IDisposable {
     // });
   }
 
-  /**
-   * Handle drag enter (highlight the border)
-   * @param event Lumino IDragEvent
-   */
-  dragEnterHandler = (event: IDragEvent) => {
-    // Highlight the border to indicate dragover
-    if (this.doseReceiveDrop) {
-      this.node.classList.add('drag-over');
-    }
-  };
-
-  /**
-   * Handle drag over (highlight the border)
-   * @param event Lumino IDragEvent
-   */
-  dragOverHandler = (event: IDragEvent) => {
-    // Highlight the border to indicate dragover
-    if (this.doseReceiveDrop) {
-      this.node.classList.add('drag-over');
-    }
-  };
 
   /**
    * Handle drag drop (highlight the border)
@@ -156,14 +135,6 @@ export class Dropzone implements IDisposable {
   //   this.stickyContent.swapDropzoneWithExistingCell(cell, cellContentType);
   // };
 
-  /**
-   * Handle drag leave (dehighlight the border)
-   * @param event Lumino IDragEvent
-   */
-  dragLeaveHandler = (event: IDragEvent) => {
-    // Dehighlight the border to indicate dragover
-    this.node.classList.remove('drag-over');
-  };
 
   /**
    * Implement this function to be consistent with other cell content
