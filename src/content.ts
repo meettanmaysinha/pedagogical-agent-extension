@@ -4,7 +4,6 @@ import { NotebookPanel } from '@jupyterlab/notebook';
 import { CodeCell, MarkdownCell, Cell } from '@jupyterlab/cells';
 
 import { Dropzone } from './dropzone';
-import { StickyMarkdown } from './markdown';
 import { StickyCode } from './code';
 import { StickyLand } from './stickyland';
 
@@ -19,7 +18,7 @@ export class StickyContent implements IDisposable {
   wrapperNode: HTMLElement;
   headerNode: HTMLElement;
   contentNode: HTMLElement;
-  curContent: Dropzone | StickyMarkdown | StickyCode;
+  curContent: Dropzone | StickyCode;
   notebook: NotebookPanel;
   stickyLand: StickyLand;
   isDisposed = false;
@@ -73,15 +72,6 @@ export class StickyContent implements IDisposable {
 
     // Add a new cell
     switch (newCellType) {
-      case ContentType.Markdown:
-        // Initialize a markdown cell
-        this.curContent = StickyMarkdown.createFromExistingCell(
-          this,
-          cell as MarkdownCell,
-          this.notebook
-        );
-        break;
-
       case ContentType.Code:
         // Initialize a code cell
         this.curContent = StickyCode.createFromExistingCell(
@@ -112,14 +102,6 @@ export class StickyContent implements IDisposable {
 
         // Initialize a new code cell
         this.curContent = StickyCode.createFromNewCell(this, this.notebook);
-        break;
-
-      case ContentType.Markdown:
-        // Remove the dropzone
-        this.curContent.dispose();
-
-        // Initialize a markdown cell
-        this.curContent = StickyMarkdown.createFromNewCell(this, this.notebook);
         break;
 
       default:

@@ -3,7 +3,6 @@ import { NotebookActions } from '@jupyterlab/notebook';
 import { NotebookPanel, Notebook } from '@jupyterlab/notebook';
 import { Cell, ICellModel } from '@jupyterlab/cells';
 import { StickyContent } from './content';
-import { StickyMarkdown } from './markdown';
 import { StickyCode } from './code';
 import { StickyLand } from './stickyland';
 import { ContentType } from './content';
@@ -319,8 +318,6 @@ export class StickyTab implements IDisposable {
       let newCellType = ContentType.Dropzone;
       if (newContent instanceof StickyCode) {
         newCellType = ContentType.Code;
-      } else if (newContent instanceof StickyMarkdown) {
-        newCellType = ContentType.Markdown;
       }
 
       // Find the new cell index
@@ -341,15 +338,6 @@ export class StickyTab implements IDisposable {
             this.activeTab.tabNode.setAttribute(
               'title',
               `Code-${newCellIndex}`
-            );
-            this.activeTab.tabNode.classList.remove('new-tab');
-            break;
-
-          case ContentType.Markdown:
-            tabLabel.innerHTML = `Markdown-${newCellIndex}`;
-            this.activeTab.tabNode.setAttribute(
-              'title',
-              `Markdown-${newCellIndex}`
             );
             this.activeTab.tabNode.classList.remove('new-tab');
             break;

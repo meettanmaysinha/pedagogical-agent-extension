@@ -1,7 +1,6 @@
 import { IDisposable } from '@lumino/disposable';
 import { ContentType } from './content';
 import { StickyCode } from './code';
-import { StickyMarkdown } from './markdown';
 import { StickyTab, Tab } from './tab';
 import { StickyLand } from './stickyland';
 import { MyIcons } from './icons';
@@ -27,7 +26,7 @@ export class FloatingWindow implements IDisposable {
   container: HTMLElement | null;
   containerSize: Size;
   node: HTMLElement;
-  stickyCell: StickyCode | StickyMarkdown;
+  stickyCell: StickyCode;
   stickyTab: StickyTab;
   stickyLand: StickyLand;
   tab: Tab | null;
@@ -41,7 +40,7 @@ export class FloatingWindow implements IDisposable {
   startPos: Position | null = null;
   endPos: Position | null = null;
 
-  constructor(cellType: ContentType, stickyCell: StickyCode | StickyMarkdown) {
+  constructor(cellType: ContentType, stickyCell: StickyCode) {
     // Create the floating window element
     this.node = document.createElement('div');
     this.node.classList.add('floating-window', 'hidden');
