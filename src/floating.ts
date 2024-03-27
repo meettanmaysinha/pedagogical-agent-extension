@@ -3,7 +3,7 @@ import { ContentType } from './content';
 import { StickyTab, Tab } from './tab';
 import { StickyLand } from './stickyland';
 import { MyIcons } from './icons';
-import { Dropzone } from './dropzone';
+import { Agent } from './agent';
 
 type Position = {
   x: number;
@@ -365,11 +365,6 @@ export class FloatingWindow implements IDisposable {
     const callback = () => {
       // First put back the cell
       this.land();
-
-      // Close the tab
-      if (this.tab) {
-        this.stickyTab.closeTab(this.tab);
-      }
 
       this.dispose();
     };

@@ -1,6 +1,5 @@
 import { IDragEvent } from '@lumino/dragdrop';
 import { NotebookPanel } from '@jupyterlab/notebook';
-
 import { StickyTab } from './tab';
 import { StickyContent } from './content';
 import { FloatingWindow } from './floating';
@@ -28,15 +27,18 @@ export class StickyLand {
     this.node = document.createElement('div');
     this.node.classList.add('sticky-container', 'hidden');
 
+    // Create a header so that users can drag
+    this.header = document.createElement('div');
+    this.header.classList.add('sticky-header');
+    this.node.appendChild(this.header);
+
     // Put stickyland below the toolbar
     const toolbarHeight = parseFloat(panel.toolbar.node.style.height);
     this.node.style.top = `${toolbarHeight + 30}px`;
     panel.node.appendChild(this.node);
 
-    // Create a header so that users can drag
-    this.header = document.createElement('div');
-    this.header.classList.add('sticky-header');
-    this.node.appendChild(this.header);
+    // Add the tab element
+    this.stickyTab = new StickyTab(this.node, panel, this);
 
     // Bound the window position inside its parent when dragging the header
     if (this.node.parentElement) {
@@ -57,9 +59,6 @@ export class StickyLand {
 
     this.initHeader();
 
-    // Add the tab element
-    this.stickyTab = new StickyTab(this.node, panel, this);
-
     // Allow users to drag to resize
     this.enableResize();
   }
@@ -71,7 +70,7 @@ export class StickyLand {
     const resizeHandle = document.createElement('div');
     resizeHandle.classList.add('resize-handle');
 
-    // Draw a few liens to signify the resize affordance
+    // Draw a few lines to signify the resize affordance
     const line1 = document.createElement('div');
     line1.classList.add('line', 'line-1');
     resizeHandle.appendChild(line1);

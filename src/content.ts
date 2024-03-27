@@ -3,7 +3,7 @@ import { IDragEvent } from '@lumino/dragdrop';
 import { NotebookPanel } from '@jupyterlab/notebook';
 import { CodeCell, MarkdownCell, Cell } from '@jupyterlab/cells';
 
-import { Dropzone } from './dropzone';
+import { Dropzone } from './agent';
 import { StickyLand } from './stickyland';
 
 export enum ContentType {
@@ -54,10 +54,6 @@ export class StickyContent implements IDisposable {
    */
   showDropzone = () => {
     this.curContent = new Dropzone(this);
-
-    // It only happens when the user closes the last sticky code/md cell
-    // Dehighlight the tab name
-    this.stickyLand.stickyTab.activeTab?.tabNode.classList.remove('new-update');
   };
 
   swapToDropzone = () => {

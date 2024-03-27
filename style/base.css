@@ -21,7 +21,7 @@
   align-items: stretch;
   overflow: hidden;
 
-  --sticky-header-height: 10px;
+  --sticky-header-height: 2px;
   --sticky-tab-height: 25px;
 }
 
