@@ -6,13 +6,12 @@ import { StickyContent, ContentType } from './content';
 import { MyIcons } from './icons';
 
 /**
- * Class that implements the Dropzone state where the StickyContent is empty
+ * Class that implements the Agent state where the StickyContent is empty
  * and waiting for users to drop some cells.
  */
-export class Dropzone implements IDisposable {
+export class Agent implements IDisposable {
   stickyContent: StickyContent;
   node: HTMLElement;
-  doseReceiveDrop: boolean;
   isDisposed = false;
   chatBox: HTMLElement;
   chatInput: HTMLTextAreaElement;
@@ -21,9 +20,8 @@ export class Dropzone implements IDisposable {
 
   constructor(stickyContent: StickyContent) {
     this.stickyContent = stickyContent;
-    this.doseReceiveDrop = true;
 
-    // Add a agent element (providing feedback of drag-and-drop)
+    // Add an agent element
     this.node = document.createElement('div');
     this.node.classList.add('agent');
     this.stickyContent.contentNode.append(this.node);
@@ -72,18 +70,12 @@ export class Dropzone implements IDisposable {
     this.chatInput = document.createElement('textarea') as HTMLTextAreaElement;
     this.chatInput.classList.add('agent-chat-input');
     chatContainer.append(this.chatInput);
+
     // Auto resize textarea based on content
     this.chatInput.addEventListener('input', function () {
       this.style.height = '22px';
       this.style.height = this.scrollHeight + 'px';
     });
-
-    // // Add a small caret down icon (from jp)
-    // const chatIcon = document.createElement('span');
-    // chatContainer.append(chatIcon);
-    // MyIcons.caretDownEmptyIcon.element({
-    //   container: chatIcon
-    // });
 
     this.chatButton = document.createElement('button') as HTMLButtonElement;
     this.chatButton.classList.add('agent-button', 'button');
@@ -92,49 +84,7 @@ export class Dropzone implements IDisposable {
     this.chatButton.innerText = 'Send';
     this.chatButton.addEventListener('click', this.buttonClickHandler);
     this.chatInput.addEventListener('keydown', this.enterKeyHandler);
-    // // Add options to the select list
-    // const newCellOptions = [
-    //   { name: 'Select new cell type', type: ContentType.Dropzone },
-    //   { name: 'Code', type: ContentType.Code },
-    //   { name: 'Markdown', type: ContentType.Markdown }
-    // ];
-
-    // newCellOptions.forEach(o => {
-    //   const option = document.createElement('option');
-    //   option.value = ContentType[o.type];
-    //   option.innerText = o.name;
-    //   this.select.append(option);
-    // });
   }
-
-
-  /**
-   * Handle drag drop (highlight the border)
-   * @param event Lumino IDragEvent
-   */
-  // dragDropHandler = (event: IDragEvent) => {
-  //   // Dehighlight the view
-  //   this.node.classList.remove('drag-over');
-  //   this.doseReceiveDrop = false;
-
-  //   // Query the notebook information
-  //   const notebook = event.source.parent as NotebookPanel;
-  //   let cell: Cell;
-  //   let cellContentType: ContentType;
-
-  //   if (event.source.activeCell instanceof MarkdownCell) {
-  //     cell = notebook.content.activeCell as MarkdownCell;
-  //     cellContentType = ContentType.Markdown;
-  //   } else {
-  //     cell = notebook.content.activeCell as CodeCell;
-  //     cellContentType = ContentType.Code;
-  //   }
-
-  //   // Create a new tab and populate it with the corresponding cell
-  //   // Swap the dropzone with the new tab
-  //   this.stickyContent.swapDropzoneWithExistingCell(cell, cellContentType);
-  // };
-
 
   /**
    * Implement this function to be consistent with other cell content
@@ -188,25 +138,6 @@ export class Dropzone implements IDisposable {
     this.chatInput.style.height = ''; // Return input box to original size
     this.addMessageHandler('user', message);
     this.chatBox.scrollTop = this.chatBox.scrollHeight; // Scroll to the bottom
-
-    // Query the current value of the cell type dropdown
-    // const curOption = <ContentType>this.select.value;
-    // switch (curOption) {
-    //   case ContentType.Code:
-    //     this.stickyContent.swapDropzoneWithNewCell(ContentType.Code);
-    //     break;
-
-    //   case ContentType.Markdown:
-    //     this.stickyContent.swapDropzoneWithNewCell(ContentType.Markdown);
-    //     break;
-
-    //   case ContentType.Dropzone:
-    //     // Noop if users do not select a new cell type
-    //     break;
-
-    //   default:
-    //     break;
-    // }
   };
 
   dispose() {

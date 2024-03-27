@@ -10,13 +10,6 @@
   width: 100%;
   margin: 10px;
   flex-grow: 1;
-  border: 3px dashed var(--jp-border-color0);
-  border-radius: 12px;
-  transition: border 300ms ease-in-out;
-}
-
-.agent.drag-over {
-  border: 3px dashed var(--md-blue-400);
 }
 
 .agent .chat-label {
@@ -85,10 +78,6 @@
   overflow-y: scroll;
 }
 
-.agent-chat-container input:hover {
-  border-color: var(--jp-border-color0);
-}
-
 .agent-chat-box {
   display: flex;
   flex-direction: column;
@@ -96,10 +85,10 @@
   height: 100%;
   overflow-y: auto;
   padding-bottom: 50px;
-  background-color: var(--jp-layout-color1);
-  border: 1px solid var(--jp-border-color2);
-  border-radius: 0.375em;
-  box-shadow: none;
+  /* background-color: var(--jp-layout-color1); */
+  /* border: 1px solid var(--jp-border-color2); */
+  /* border-radius: 0.375em; */
+  /* box-shadow: none; */
   color: var(--jp-ui-font-color0);
   font-size: var(--jp-ui-font-size1);
   line-height: 14px;
