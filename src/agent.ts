@@ -4,6 +4,7 @@ import { NotebookPanel } from '@jupyterlab/notebook';
 import { CodeCell, MarkdownCell, Cell } from '@jupyterlab/cells';
 import { StickyContent, ContentType } from './content';
 import { MyIcons } from './icons';
+// import axios from 'axios';
 
 /**
  * Class that implements the Agent state where the StickyContent is empty
@@ -16,6 +17,7 @@ export class Agent implements IDisposable {
   chatBox: HTMLElement;
   chatInput: HTMLTextAreaElement;
   chatButton: HTMLButtonElement;
+  doseReceiveDrop: boolean;
   static numDz = 0;
 
   constructor(stickyContent: StickyContent) {
@@ -30,6 +32,8 @@ export class Agent implements IDisposable {
     this.chatBox = document.createElement('span') as HTMLElement;
     this.chatBox.classList.add('agent-chat-box');
     this.node.append(this.chatBox);
+
+    this.doseReceiveDrop = false;
 
     if (this.node.getElementsByClassName('agent-chat-box').length === 0) {
       // Initialize the content
@@ -87,13 +91,10 @@ export class Agent implements IDisposable {
   }
 
   /**
-   * Implement this function to be consistent with other cell content
+   * Adds a new message to the chat box, depending on role
+   * @param role Role of sender (user, system)
+   * @param message Content of message
    */
-  closeClicked = () => {
-    // pass
-  };
-
-  // Adds a new message to the chat box, depending on role
   addMessageHandler = (role: string, message: string) => {
     const chatMessage = document.createElement('div');
     const chatRole = document.createElement('div');
@@ -111,6 +112,15 @@ export class Agent implements IDisposable {
   };
 
   /**
+   * Retrieves message from Agent's LLM
+   * @param message Content of message
+   */
+  queryResponse = (message: string) => {
+    // TODO: Implement LLM connection
+    return "Good job on the work so far, keep it up!"
+  };
+
+  /**
    * Handle keyboard enter in the chat input
    * @param event Keyboard press event
    */
@@ -124,6 +134,7 @@ export class Agent implements IDisposable {
       this.chatInput.style.height = ''; // Return input box to original size
       this.addMessageHandler('user', message);
       this.chatBox.scrollTop = this.chatBox.scrollHeight; // Scroll to the bottom
+      this.addMessageHandler('system', this.queryResponse(message))
     }
   };
 
@@ -140,8 +151,66 @@ export class Agent implements IDisposable {
     this.chatBox.scrollTop = this.chatBox.scrollHeight; // Scroll to the bottom
   };
 
+  /**
+   * Handle drag enter (highlight the border)
+   * @param event Lumino IDragEvent
+   */
+  dragEnterHandler = (event: IDragEvent) => {
+    // Highlight the border to indicate dragover
+    if (this.doseReceiveDrop) {
+        this.node.classList.add('drag-over');
+    }
+  };
+
+  /**
+   * Handle drag over (highlight the border)
+   * @param event Lumino IDragEvent
+   */
+  dragOverHandler = (event: IDragEvent) => {
+    // Highlight the border to indicate dragover
+    if (this.doseReceiveDrop) {
+        this.node.classList.add('drag-over');
+    }
+  };
+
+  /**
+   * Handle drag drop (highlight the border)
+   * @param event Lumino IDragEvent
+   */
+  dragDropHandler = (event: IDragEvent) => {
+    // Dehighlight the view
+    this.node.classList.remove('drag-over');
+    this.doseReceiveDrop = false;
+
+    // Query the notebook information
+    const notebook = event.source.parent as NotebookPanel;
+    let cell: Cell;
+    let cellContentType: ContentType;
+
+    if (event.source.activeCell instanceof MarkdownCell) {
+      cell = notebook.content.activeCell as MarkdownCell;
+      cellContentType = ContentType.Markdown;
+    } else {
+      cell = notebook.content.activeCell as CodeCell;
+      cellContentType = ContentType.Code;
+    }
+
+    // Create a new tab and populate it with the corresponding cell
+    // Swap the dropzone with the new tab
+    // this.stickyContent.swapDropzoneWithExistingCell(cell, cellContentType);
+  };
+
+  /**
+   * Handle drag leave (dehighlight the border)
+   * @param event Lumino IDragEvent
+   */
+  dragLeaveHandler = (event: IDragEvent) => {
+    // Dehighlight the border to indicate dragover
+    this.node.classList.remove('drag-over');
+  };
+
   dispose() {
     this.node.remove();
     this.isDisposed = true;
-  }
+  }    
 }

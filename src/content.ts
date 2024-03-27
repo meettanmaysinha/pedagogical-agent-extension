@@ -45,27 +45,66 @@ export class StickyContent implements IDisposable {
     this.contentNode.classList.add('content');
     this.wrapperNode.appendChild(this.contentNode);
 
-    // Show a dropzone at first
+    // Show an agent at first
     this.curContent = new Agent(this);
   }
 
   /**
-   * Replace the current content with a dropzone
+   * Replace the current content with an agent
    */
   showAgent = () => {
     this.curContent = new Agent(this);
   };
 
-  swapToAgent = () => {
-    // Dispose the current content
-    this.curContent.closeClicked();
+  // swapToAgent = () => {
+  //   // Dispose the current content
+  //   this.curContent.closeClicked();
+  // };
+
+  /**
+   * Handle drag enter according to the current content type
+   * @param event Lumino IDragEvent
+   */
+  dragEnterHandler = (event: IDragEvent) => {
+    if (this.curContent instanceof Agent) {
+      this.curContent.dragEnterHandler(event);
+    }
   };
 
+  /**
+   * Handle drag over according to the current content type
+   * @param event Lumino IDragEvent
+   */
+  dragOverHandler = (event: IDragEvent) => {
+    if (this.curContent instanceof Agent) {
+      this.curContent.dragOverHandler(event);
+    }
+  };
+
+  // /**
+  //  * Handle drop leave according to the current content type
+  //  * @param event Lumino IDragEvent
+  //  */
+  dragDropHandler = (event: IDragEvent) => {
+    if (this.curContent instanceof Agent) {
+      this.curContent.dragDropHandler(event);
+    }
+  };
+
+  /**
+   * Handle drag leave according to the current content type
+   * @param event Lumino IDragEvent
+   */
+  dragLeaveHandler = (event: IDragEvent) => {
+    if (this.curContent instanceof Agent) {
+      this.curContent.dragLeaveHandler(event);
+    }
+  };
   dispose = () => {
     // Dispose the current content
-    this.curContent.closeClicked();
+    // this.curContent.closeClicked();
 
-    // Dispose the dropzone
+    // Dispose the agent
     this.curContent.dispose();
     this.wrapperNode.remove();
     this.isDisposed = true;
