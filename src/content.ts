@@ -3,11 +3,11 @@ import { IDragEvent } from '@lumino/dragdrop';
 import { NotebookPanel } from '@jupyterlab/notebook';
 import { CodeCell, MarkdownCell, Cell } from '@jupyterlab/cells';
 
-import { Dropzone } from './agent';
+import { Agent } from './agent';
 import { StickyLand } from './stickyland';
 
 export enum ContentType {
-  Dropzone = 'Dropzone',
+  Agent = 'Agent',
   Code = 'Code',
   Markdown = 'Markdown'
 }
@@ -17,7 +17,7 @@ export class StickyContent implements IDisposable {
   wrapperNode: HTMLElement;
   headerNode: HTMLElement;
   contentNode: HTMLElement;
-  curContent: Dropzone;
+  curContent: Agent;
   notebook: NotebookPanel;
   stickyLand: StickyLand;
   isDisposed = false;
@@ -46,17 +46,17 @@ export class StickyContent implements IDisposable {
     this.wrapperNode.appendChild(this.contentNode);
 
     // Show a dropzone at first
-    this.curContent = new Dropzone(this);
+    this.curContent = new Agent(this);
   }
 
   /**
    * Replace the current content with a dropzone
    */
-  showDropzone = () => {
-    this.curContent = new Dropzone(this);
+  showAgent = () => {
+    this.curContent = new Agent(this);
   };
 
-  swapToDropzone = () => {
+  swapToAgent = () => {
     // Dispose the current content
     this.curContent.closeClicked();
   };

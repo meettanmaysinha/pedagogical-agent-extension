@@ -61,7 +61,7 @@ export class StickyTab implements IDisposable {
 
     // Add this tab to the model and view
     const newTab: Tab = {
-      cellType: ContentType.Dropzone,
+      cellType: ContentType.Agent,
       cellIndex: 0,
       tabNode: tabNode,
       tabContent: tabContent,

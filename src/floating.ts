@@ -26,7 +26,7 @@ export class FloatingWindow implements IDisposable {
   container: HTMLElement | null;
   containerSize: Size;
   node: HTMLElement;
-  stickyCell: Dropzone;
+  stickyCell: Agent;
   stickyTab: StickyTab;
   stickyLand: StickyLand;
   tab: Tab | null;
@@ -40,7 +40,7 @@ export class FloatingWindow implements IDisposable {
   startPos: Position | null = null;
   endPos: Position | null = null;
 
-  constructor(cellType: ContentType, stickyCell: Dropzone) {
+  constructor(cellType: ContentType, stickyCell: Agent) {
     // Create the floating window element
     this.node = document.createElement('div');
     this.node.classList.add('floating-window', 'hidden');
