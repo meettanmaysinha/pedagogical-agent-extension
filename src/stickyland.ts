@@ -4,6 +4,7 @@ import { StickyTab } from './tab';
 import { StickyContent } from './content';
 import { FloatingWindow } from './floating';
 import { MyIcons } from './icons';
+import { Cell, CodeCell } from '@jupyterlab/cells';
 
 const MIN_WIDTH = 235;
 const MIN_HEIGHT = 240;
@@ -19,11 +20,12 @@ export class StickyLand {
   node: HTMLElement;
   header: HTMLElement;
   stickyTab: StickyTab;
-  stickyContent: StickyContent | null = null;
+  // stickyContent: StickyContent | null = null;
   floatingWindows: FloatingWindow[] = [];
   containerSize: ContainerPos;
 
   constructor(panel: NotebookPanel) {
+    console.log('Stickyland Constructed');
     this.node = document.createElement('div');
     this.node.classList.add('sticky-container', 'hidden');
 
@@ -87,6 +89,15 @@ export class StickyLand {
       true
     );
   }
+
+  /**
+   * Get information from the notebook cell dropped inside the window
+   */
+  getDroppedCellInfo = (cell: CodeCell) => {
+    console.log('Drop everything now');
+    console.log(cell.model.metadata);
+    return cell.model.metadata;
+  };
 
   /**
    * Allow users to drag the bottom left corner to resize the container
@@ -249,10 +260,12 @@ export class StickyLand {
   dragDropHandler = (event: IDragEvent) => {
     event.preventDefault();
     event.stopPropagation();
-
+    console.log('Very Happy');
+    console.log(this.stickyTab);
     // Let the content handle drag drop
-    if (this.stickyContent) {
-      this.stickyContent.dragDropHandler(event);
+    if (this.stickyTab.tabContent) {
+      console.log('Happy');
+      this.stickyTab.tabContent.dragDropHandler(event);
     }
   };
 
@@ -271,8 +284,8 @@ export class StickyLand {
     event.stopPropagation();
 
     // Change the view of content
-    if (this.stickyContent) {
-      this.stickyContent.dragEnterHandler(event);
+    if (this.stickyTab.tabContent) {
+      this.stickyTab.tabContent.dragEnterHandler(event);
     }
   };
 
@@ -298,8 +311,8 @@ export class StickyLand {
     event.dropAction = 'copy';
 
     // Change the view of content
-    if (this.stickyContent) {
-      this.stickyContent.dragOverHandler(event);
+    if (this.stickyTab.tabContent) {
+      this.stickyTab.tabContent.dragOverHandler(event);
     }
   };
 
@@ -318,8 +331,8 @@ export class StickyLand {
     event.stopPropagation();
 
     // Change the view of content
-    if (this.stickyContent) {
-      this.stickyContent.dragLeaveHandler(event);
+    if (this.stickyTab.tabContent) {
+      this.stickyTab.tabContent.dragLeaveHandler(event);
     }
   };
 }

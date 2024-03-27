@@ -21,6 +21,7 @@ export class Agent implements IDisposable {
   static numDz = 0;
 
   constructor(stickyContent: StickyContent) {
+    console.log('Agent constructed');
     this.stickyContent = stickyContent;
 
     // Add an agent element
@@ -158,7 +159,7 @@ export class Agent implements IDisposable {
   dragEnterHandler = (event: IDragEvent) => {
     // Highlight the border to indicate dragover
     if (this.doseReceiveDrop) {
-        this.node.classList.add('drag-over');
+        // this.node.classList.add('drag-over');
     }
   };
 
@@ -169,7 +170,7 @@ export class Agent implements IDisposable {
   dragOverHandler = (event: IDragEvent) => {
     // Highlight the border to indicate dragover
     if (this.doseReceiveDrop) {
-        this.node.classList.add('drag-over');
+        // this.node.classList.add('drag-over');
     }
   };
 
@@ -179,7 +180,7 @@ export class Agent implements IDisposable {
    */
   dragDropHandler = (event: IDragEvent) => {
     // Dehighlight the view
-    this.node.classList.remove('drag-over');
+    // this.node.classList.remove('drag-over');
     this.doseReceiveDrop = false;
 
     // Query the notebook information
@@ -187,12 +188,14 @@ export class Agent implements IDisposable {
     let cell: Cell;
     let cellContentType: ContentType;
 
-    if (event.source.activeCell instanceof MarkdownCell) {
-      cell = notebook.content.activeCell as MarkdownCell;
-      cellContentType = ContentType.Markdown;
-    } else {
+    if (event.source.activeCell instanceof CodeCell) {
       cell = notebook.content.activeCell as CodeCell;
       cellContentType = ContentType.Code;
+      this.addMessageHandler('system',"Cell droppped");
+    } else {
+      cell = notebook.content.activeCell as MarkdownCell;
+      cellContentType = ContentType.Markdown;
+      this.addMessageHandler('system',"Markdown dropped");
     }
 
     // Create a new tab and populate it with the corresponding cell
