@@ -204,8 +204,14 @@ export class Agent implements IDisposable {
 
     //   cell = event.source.activeCell;
     //   const cellInformation = JSON.stringify(this.getDroppedCellInfo(event.source.activeCell));
-      const cellInformation = JSON.stringify(cell.model.toJSON());
-      this.addMessageHandler('system', cellInformation);
+      const cellInformation = cell.model.toJSON();
+      const extractedCellInfo = {
+        id: cellInformation.id, // id of cell
+        source: cellInformation.source, // Content inside the cell
+        execution_count : cellInformation.execution_count, // Number of times cell was executed
+        outputs: cellInformation.outputs, // Output information - Shows error details if cell has error
+      }
+      this.addMessageHandler('system', JSON.stringify(extractedCellInfo));
     } else {
     //   cell = notebook.content.activeCell as MarkdownCell;
     //   cellContentType = ContentType.Markdown;
