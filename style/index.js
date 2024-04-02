@@ -1,5 +1,5 @@
 import './base.css';
 import './toolbar.css';
-import './dropzone.css';
+import './agent.css';
 import './code.css';
 import './floating.css';

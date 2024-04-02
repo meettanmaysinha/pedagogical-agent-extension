@@ -4,7 +4,7 @@ import { NotebookPanel } from '@jupyterlab/notebook';
 import { CodeCell, MarkdownCell, Cell } from '@jupyterlab/cells';
 import { StickyContent, ContentType } from './content';
 import { MyIcons } from './icons';
-// import axios from 'axios';
+import axios from 'axios';
 
 /**
  * Class that implements the Agent state where the StickyContent is empty
@@ -96,29 +96,40 @@ export class Agent implements IDisposable {
    * @param role Role of sender (user, system)
    * @param message Content of message
    */
-  addMessageHandler = (role: string, message: string) => {
+  addMessageHandler = async (role: string, message: string) => {
     const chatMessage = document.createElement('div');
     const chatRole = document.createElement('div');
     chatMessage.classList.add('chat-message');
     if (role === 'system') {
       chatRole.classList.add('system-role');
       chatRole.innerText = 'System';
+      chatMessage.innerText = message;
+      this.chatBox.append(chatRole);
+      this.chatBox.append(chatMessage);
     } else if (role === 'user') {
       chatRole.classList.add('user-role');
       chatRole.innerText = 'You';
+      chatMessage.innerText = message;
+      this.chatBox.append(chatRole);
+      this.chatBox.append(chatMessage);
+      this.addMessageHandler('system', await this.queryResponse(message));
     }
-    chatMessage.innerText = message;
-    this.chatBox.append(chatRole);
-    this.chatBox.append(chatMessage);
   };
 
   /**
    * Retrieves message from Agent's LLM
    * @param message Content of message
    */
-  queryResponse = (message: string) => {
+  queryResponse = async (content: string) => {
     // TODO: Implement LLM connection
-    return "Good job on the work so far, keep it up!"
+    console.log('Querying...');
+    const agentAPIEndPoint = 'http://localhost:8000/api/chat';
+
+    const agentResponse = await axios.post(agentAPIEndPoint, {
+      cells_content: content
+    });
+    console.log(agentResponse.data.response);
+    return agentResponse.data.response;
   };
 
   /**
@@ -135,7 +146,6 @@ export class Agent implements IDisposable {
       this.chatInput.style.height = ''; // Return input box to original size
       this.addMessageHandler('user', message);
       this.chatBox.scrollTop = this.chatBox.scrollHeight; // Scroll to the bottom
-      this.addMessageHandler('system', this.queryResponse(message))
     }
   };
 
@@ -151,7 +161,6 @@ export class Agent implements IDisposable {
     this.addMessageHandler('user', message);
     this.chatBox.scrollTop = this.chatBox.scrollHeight; // Scroll to the bottom
   };
-
 
   /**
    * Get information from the notebook cell dropped inside the window
@@ -200,24 +209,23 @@ export class Agent implements IDisposable {
 
     if (event.source.activeCell instanceof CodeCell) {
       cell = notebook.content.activeCell as CodeCell;
-    //   cellContentType = ContentType.Code;
+      //   cellContentType = ContentType.Code;
 
-    //   cell = event.source.activeCell;
-    //   const cellInformation = JSON.stringify(this.getDroppedCellInfo(event.source.activeCell));
+      //   cell = event.source.activeCell;
+      //   const cellInformation = JSON.stringify(this.getDroppedCellInfo(event.source.activeCell));
       const cellInformation = cell.model.toJSON();
       const extractedCellInfo = {
         id: cellInformation.id, // id of cell
         source: cellInformation.source, // Content inside the cell
-        execution_count : cellInformation.execution_count, // Number of times cell was executed
-        outputs: cellInformation.outputs, // Output information - Shows error details if cell has error
-      }
+        execution_count: cellInformation.execution_count, // Number of times cell was executed
+        outputs: cellInformation.outputs // Output information - Shows error details if cell has error
+      };
       this.addMessageHandler('system', JSON.stringify(extractedCellInfo));
     } else {
-    //   cell = notebook.content.activeCell as MarkdownCell;
-    //   cellContentType = ContentType.Markdown;
-
+      //   cell = notebook.content.activeCell as MarkdownCell;
+      //   cellContentType = ContentType.Markdown;
       cell = event.source.activeCell;
-      this.addMessageHandler('system',"Markdown dropped");
+      this.addMessageHandler('system', 'Markdown dropped');
     }
 
     // Create a new tab and populate it with the corresponding cell
