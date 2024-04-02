@@ -19,8 +19,8 @@ export class StickyTab implements IDisposable {
   stickyContainer: HTMLElement;
   stickyLand: StickyLand;
   notebook: NotebookPanel;
+  tabContent: StickyContent;
   activeTab: Tab | null = null;
-  tabs: Tab[] = [];
 
   autoRunTimeout: number | null = null;
   autoRunningCellNodes: Set<HTMLElement> = new Set([]);
@@ -32,12 +32,13 @@ export class StickyTab implements IDisposable {
     panel: NotebookPanel,
     stickyLand: StickyLand
   ) {
+    console.log('Tab Constructed');
     this.stickyContainer = stickyContainer;
     this.stickyLand = stickyLand;
     this.notebook = panel;
 
     // Create the first tab
-    this.createTab();
+    this.tabContent = this.createTab().tabContent;
   }
 
   /**

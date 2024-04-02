@@ -17,7 +17,7 @@ export class StickyContent implements IDisposable {
   wrapperNode: HTMLElement;
   headerNode: HTMLElement;
   contentNode: HTMLElement;
-  curContent: Agent;
+  agent: Agent;
   notebook: NotebookPanel;
   stickyLand: StickyLand;
   isDisposed = false;
@@ -27,6 +27,7 @@ export class StickyContent implements IDisposable {
     panel: NotebookPanel,
     stickyLand: StickyLand
   ) {
+    console.log('Sticky Content Constructed');
     this.stickyContainer = stickyContainer;
     this.notebook = panel;
     this.stickyLand = stickyLand;
@@ -46,19 +47,19 @@ export class StickyContent implements IDisposable {
     this.wrapperNode.appendChild(this.contentNode);
 
     // Show an agent at first
-    this.curContent = new Agent(this);
+    this.agent = new Agent(this);
   }
 
   /**
    * Replace the current content with an agent
    */
   showAgent = () => {
-    this.curContent = new Agent(this);
+    this.agent = new Agent(this);
   };
 
   // swapToAgent = () => {
   //   // Dispose the current content
-  //   this.curContent.closeClicked();
+  //   this.agent.closeClicked();
   // };
 
   /**
@@ -66,8 +67,8 @@ export class StickyContent implements IDisposable {
    * @param event Lumino IDragEvent
    */
   dragEnterHandler = (event: IDragEvent) => {
-    if (this.curContent instanceof Agent) {
-      this.curContent.dragEnterHandler(event);
+    if (this.agent instanceof Agent) {
+      this.agent.dragEnterHandler(event);
     }
   };
 
@@ -76,8 +77,8 @@ export class StickyContent implements IDisposable {
    * @param event Lumino IDragEvent
    */
   dragOverHandler = (event: IDragEvent) => {
-    if (this.curContent instanceof Agent) {
-      this.curContent.dragOverHandler(event);
+    if (this.agent instanceof Agent) {
+      this.agent.dragOverHandler(event);
     }
   };
 
@@ -86,8 +87,8 @@ export class StickyContent implements IDisposable {
   //  * @param event Lumino IDragEvent
   //  */
   dragDropHandler = (event: IDragEvent) => {
-    if (this.curContent instanceof Agent) {
-      this.curContent.dragDropHandler(event);
+    if (this.agent instanceof Agent) {
+      this.agent.dragDropHandler(event);
     }
   };
 
@@ -96,16 +97,16 @@ export class StickyContent implements IDisposable {
    * @param event Lumino IDragEvent
    */
   dragLeaveHandler = (event: IDragEvent) => {
-    if (this.curContent instanceof Agent) {
-      this.curContent.dragLeaveHandler(event);
+    if (this.agent instanceof Agent) {
+      this.agent.dragLeaveHandler(event);
     }
   };
   dispose = () => {
     // Dispose the current content
-    // this.curContent.closeClicked();
+    // this.agent.closeClicked();
 
     // Dispose the agent
-    this.curContent.dispose();
+    this.agent.dispose();
     this.wrapperNode.remove();
     this.isDisposed = true;
   };

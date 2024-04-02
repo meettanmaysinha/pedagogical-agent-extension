@@ -26,7 +26,7 @@ export class FloatingWindow implements IDisposable {
   container: HTMLElement | null;
   containerSize: Size;
   node: HTMLElement;
-  stickyCell: Agent;
+  agent: Agent;
   stickyTab: StickyTab;
   stickyLand: StickyLand;
   tab: Tab | null;
@@ -40,7 +40,7 @@ export class FloatingWindow implements IDisposable {
   startPos: Position | null = null;
   endPos: Position | null = null;
 
-  constructor(cellType: ContentType, stickyCell: Agent) {
+  constructor(cellType: ContentType, agent: Agent) {
     // Create the floating window element
     this.node = document.createElement('div');
     this.node.classList.add('floating-window', 'hidden');
@@ -77,13 +77,13 @@ export class FloatingWindow implements IDisposable {
 
     const headerText = document.createElement('span');
     this.cellType = cellType;
-    this.stickyCell = stickyCell;
-    this.stickyTab = this.stickyCell.stickyContent.stickyLand.stickyTab;
+    this.agent = agent;
+    this.stickyTab = this.agent.stickyContent.stickyLand.stickyTab;
     this.tab = this.stickyTab.activeTab;
-    this.stickyLand = this.stickyCell.stickyContent.stickyLand;
+    this.stickyLand = this.agent.stickyContent.stickyLand;
 
     // We first put the cell on the left edge of the notebook panel
-    const initLeft = this.stickyCell.node.getBoundingClientRect().x + 10;
+    const initLeft = this.agent.node.getBoundingClientRect().x + 10;
 
     // Position the node to the inner region and offset it a little bit when
     // users create multiple windows
@@ -152,7 +152,7 @@ export class FloatingWindow implements IDisposable {
 
     // Hide the launching icon
     const launchIcon =
-      this.stickyCell.stickyContent.headerNode.querySelector(
+      this.agent.stickyContent.headerNode.querySelector(
         '.button-launch'
       )?.parentElement;
     launchIcon?.classList.add('no-display');
@@ -161,12 +161,10 @@ export class FloatingWindow implements IDisposable {
     this.startPos = this.registerStartPos();
 
     // Add the content from the cell to the floating window
-    const floatingContent = this.stickyCell.stickyContent.wrapperNode.cloneNode(
+    const floatingContent = this.agent.stickyContent.wrapperNode.cloneNode(
       false
     ) as HTMLElement;
-    floatingContent.append(
-      ...this.stickyCell.stickyContent.wrapperNode.childNodes
-    );
+    floatingContent.append(...this.agent.stickyContent.wrapperNode.childNodes);
     this.node.append(floatingContent);
 
     // Set the initial width to fit the codemirror default width
@@ -196,8 +194,7 @@ export class FloatingWindow implements IDisposable {
    * Compute the initial window position + size
    */
   registerStartPos = () => {
-    const bbox =
-      this.stickyCell.stickyContent.wrapperNode.getBoundingClientRect();
+    const bbox = this.agent.stickyContent.wrapperNode.getBoundingClientRect();
 
     const headerHeight = 28;
 
@@ -307,7 +304,7 @@ export class FloatingWindow implements IDisposable {
   addPlaceholder = () => {
     const placeholder = document.createElement('div');
     placeholder.classList.add('floating-placeholder');
-    this.stickyCell.stickyContent.wrapperNode.appendChild(placeholder);
+    this.agent.stickyContent.wrapperNode.appendChild(placeholder);
 
     // Add an icon
     const addIconElem = document.createElement('div');
@@ -383,25 +380,22 @@ export class FloatingWindow implements IDisposable {
     // Put back the elements to stickyland
     const floatingWrapper = this.node.querySelector('.sticky-content');
     if (floatingWrapper) {
-      this.stickyCell.stickyContent.wrapperNode.append(
+      this.agent.stickyContent.wrapperNode.append(
         ...floatingWrapper.childNodes
       );
     }
 
     // Show the launching icon
     const launchIcon =
-      this.stickyCell.stickyContent.headerNode.querySelector(
+      this.agent.stickyContent.headerNode.querySelector(
         '.button-launch'
       )?.parentElement;
     launchIcon?.classList.remove('no-display');
 
     // Remove the FloatingWindow object from the sticky content
     const windowIndex =
-      this.stickyCell.stickyContent.stickyLand.floatingWindows.indexOf(this);
-    this.stickyCell.stickyContent.stickyLand.floatingWindows.splice(
-      windowIndex,
-      1
-    );
+      this.agent.stickyContent.stickyLand.floatingWindows.indexOf(this);
+    this.agent.stickyContent.stickyLand.floatingWindows.splice(windowIndex, 1);
   };
 
   /**
