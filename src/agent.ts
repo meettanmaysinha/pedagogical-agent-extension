@@ -220,7 +220,7 @@ export class Agent implements IDisposable {
         execution_count: cellInformation.execution_count, // Number of times cell was executed
         outputs: cellInformation.outputs // Output information - Shows error details if cell has error
       };
-      this.addMessageHandler('system', JSON.stringify(extractedCellInfo));
+      this.addMessageHandler('user', JSON.stringify(extractedCellInfo));
     } else {
       //   cell = notebook.content.activeCell as MarkdownCell;
       //   cellContentType = ContentType.Markdown;
