@@ -4,7 +4,6 @@ import { StickyTab } from './tab';
 import { StickyContent } from './content';
 import { FloatingWindow } from './floating';
 import { MyIcons } from './icons';
-import { Cell, CodeCell } from '@jupyterlab/cells';
 
 const MIN_WIDTH = 235;
 const MIN_HEIGHT = 240;
@@ -89,15 +88,6 @@ export class StickyLand {
       true
     );
   }
-
-  /**
-   * Get information from the notebook cell dropped inside the window
-   */
-  getDroppedCellInfo = (cell: CodeCell) => {
-    console.log('Drop everything now');
-    console.log(cell.model.metadata);
-    return cell.model.metadata;
-  };
 
   /**
    * Allow users to drag the bottom left corner to resize the container

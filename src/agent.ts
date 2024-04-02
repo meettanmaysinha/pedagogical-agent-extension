@@ -152,6 +152,16 @@ export class Agent implements IDisposable {
     this.chatBox.scrollTop = this.chatBox.scrollHeight; // Scroll to the bottom
   };
 
+
+  /**
+   * Get information from the notebook cell dropped inside the window
+   */
+  getDroppedCellInfo = (cell: CodeCell) => {
+    console.log('Drop everything now');
+    console.log(cell.model.metadata);
+    return cell.model.metadata;
+  };
+
   /**
    * Handle drag enter (highlight the border)
    * @param event Lumino IDragEvent
@@ -190,11 +200,17 @@ export class Agent implements IDisposable {
 
     if (event.source.activeCell instanceof CodeCell) {
       cell = notebook.content.activeCell as CodeCell;
-      cellContentType = ContentType.Code;
-      this.addMessageHandler('system',"Cell droppped");
+    //   cellContentType = ContentType.Code;
+
+    //   cell = event.source.activeCell;
+    //   const cellInformation = JSON.stringify(this.getDroppedCellInfo(event.source.activeCell));
+      const cellInformation = JSON.stringify(cell.model.toJSON());
+      this.addMessageHandler('system', cellInformation);
     } else {
-      cell = notebook.content.activeCell as MarkdownCell;
-      cellContentType = ContentType.Markdown;
+    //   cell = notebook.content.activeCell as MarkdownCell;
+    //   cellContentType = ContentType.Markdown;
+
+      cell = event.source.activeCell;
       this.addMessageHandler('system',"Markdown dropped");
     }
 
