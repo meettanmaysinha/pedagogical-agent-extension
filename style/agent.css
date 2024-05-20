@@ -118,6 +118,7 @@
 .agent-chat-box .chat-message {
   display: flex;
   flex-direction: column;
+  text-align: justify;
   box-shadow: 0 1px 0 #c3c2c0;
   padding: 5px 15px 15px 15px;
   margin:0;
