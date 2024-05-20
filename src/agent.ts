@@ -106,6 +106,7 @@ export class Agent implements IDisposable {
       chatMessage.innerText = message;
       this.chatBox.append(chatRole);
       this.chatBox.append(chatMessage);
+      // this.streamChat(message, 0, chatMessage); // To be implemented if using streaming
     } else if (role === 'user') {
       chatRole.classList.add('user-role');
       chatRole.innerText = 'You';
@@ -115,6 +116,21 @@ export class Agent implements IDisposable {
       this.addMessageHandler('system', await this.queryResponse(message));
     }
   };
+
+  // // Function to simulate streaming chat effect
+  // streamChat = (messages: string, index = 0, chatMessage: HTMLDivElement) => {
+  //   if (index < messages.length) {
+  //     chatMessage.innerText += messages[index];
+
+  //     // Automatically scroll to the bottom of the chat container
+  //     chatMessage.scrollTop = chatMessage.scrollHeight;
+
+  //     // Recursive call with a delay
+  //     setTimeout(() => {
+  //       this.streamChat(messages, index + 1, chatMessage);
+  //     }, 0.1); // Adjust the delay (in milliseconds) as needed
+  //   }
+  // };
 
   /**
    * Retrieves message from Agent's LLM
@@ -126,7 +142,7 @@ export class Agent implements IDisposable {
     const agentAPIEndPoint = 'http://localhost:8000/api/chat';
 
     const agentResponse = await axios.post(agentAPIEndPoint, {
-      cells_content: content
+      message_content: content
     });
     console.log(agentResponse.data.response);
     return agentResponse.data.response;
