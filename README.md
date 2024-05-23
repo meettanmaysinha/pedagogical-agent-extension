@@ -43,6 +43,20 @@ jupyter lab
 ```
 Changes to extension will be automatically saved. Refresh JupyterLab to apply changes.
 
+## Citation and References
+This extension was modified from [StickyLand](https://github.com/xiaohk/stickyland)
+
+```bibTeX
+@inproceedings{wangStickyLandBreakingLinear2022,
+  title = {{{StickyLand}}: {{Breaking}} the {{Linear Presentation}} of {{Computational Notebooks}}},
+  shorttitle = {{{StickyLand}}},
+  booktitle = {Extended {{Abstracts}} of the 2022 {{CHI Conference}} on {{Human Factors}} in {{Computing Systems}}},
+  author = {Wang, Zijie J. and Dai, Katie and Edwards, W. Keith},
+  year = {2022},
+  publisher = {{ACM}}
+}
+```
+
 ## License
 
 The software is available under the [BSD-3-Clause License](https://github.com/xiaohk/stickyland/blob/master/LICENSE).
