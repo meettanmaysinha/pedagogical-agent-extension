@@ -11,7 +11,7 @@ USER jovyan
 WORKDIR /usr/src/app
 
 # Install pre-requisite package from stickyland
-RUN conda install stickyland
+RUN pip install stickyland
 
 # Copy all source files from the host to the container
 COPY --chown=jovyan ../ ./

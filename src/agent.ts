@@ -106,6 +106,7 @@ export class Agent implements IDisposable {
       chatMessage.innerText = message;
       this.chatBox.append(chatRole);
       this.chatBox.append(chatMessage);
+      // this.streamChat(message, 0, chatMessage); // To be implemented if using streaming
     } else if (role === 'user') {
       chatRole.classList.add('user-role');
       chatRole.innerText = 'You';
@@ -117,6 +118,50 @@ export class Agent implements IDisposable {
   };
 
   /**
+   * When user drags cell into chat box, add the code cell content into chatbox
+   * @param role Role of sender (user, system)
+   * @param message Content of message
+   */
+  addCellMessageHandler = async (role: string, cellContent: any) => {
+    const chatMessage = document.createElement('div');
+    const chatRole = document.createElement('div');
+    chatMessage.classList.add('chat-message');
+    if (role === 'system') {
+      chatRole.classList.add('system-role');
+      chatRole.innerText = 'System';
+      chatMessage.innerText = cellContent.source;
+      this.chatBox.append(chatRole);
+      this.chatBox.append(chatMessage);
+      // this.streamChat(message, 0, chatMessage); // To be implemented if using streaming
+    } else if (role === 'user') {
+      chatRole.classList.add('user-role');
+      chatRole.innerText = 'You';
+      chatMessage.innerText = cellContent.source;
+      this.chatBox.append(chatRole);
+      this.chatBox.append(chatMessage);
+      this.addMessageHandler(
+        'system',
+        await this.queryResponse(JSON.stringify(cellContent))
+      );
+    }
+  };
+
+  // // Function to simulate streaming chat effect
+  // streamChat = (messages: string, index = 0, chatMessage: HTMLDivElement) => {
+  //   if (index < messages.length) {
+  //     chatMessage.innerText += messages[index];
+
+  //     // Automatically scroll to the bottom of the chat container
+  //     chatMessage.scrollTop = chatMessage.scrollHeight;
+
+  //     // Recursive call with a delay
+  //     setTimeout(() => {
+  //       this.streamChat(messages, index + 1, chatMessage);
+  //     }, 0.1); // Adjust the delay (in milliseconds) as needed
+  //   }
+  // };
+
+  /**
    * Retrieves message from Agent's LLM
    * @param message Content of message
    */
@@ -126,7 +171,7 @@ export class Agent implements IDisposable {
     const agentAPIEndPoint = 'http://localhost:8000/api/chat';
 
     const agentResponse = await axios.post(agentAPIEndPoint, {
-      cells_content: content
+      message_content: content
     });
     console.log(agentResponse.data.response);
     return agentResponse.data.response;
@@ -178,7 +223,7 @@ export class Agent implements IDisposable {
   dragEnterHandler = (event: IDragEvent) => {
     // Highlight the border to indicate dragover
     if (this.doseReceiveDrop) {
-        // this.node.classList.add('drag-over');
+      // this.node.classList.add('drag-over');
     }
   };
 
@@ -189,7 +234,7 @@ export class Agent implements IDisposable {
   dragOverHandler = (event: IDragEvent) => {
     // Highlight the border to indicate dragover
     if (this.doseReceiveDrop) {
-        // this.node.classList.add('drag-over');
+      // this.node.classList.add('drag-over');
     }
   };
 
@@ -220,13 +265,15 @@ export class Agent implements IDisposable {
         execution_count: cellInformation.execution_count, // Number of times cell was executed
         outputs: cellInformation.outputs // Output information - Shows error details if cell has error
       };
-      this.addMessageHandler('system', JSON.stringify(extractedCellInfo));
+      this.addCellMessageHandler('user', extractedCellInfo);
     } else {
       //   cell = notebook.content.activeCell as MarkdownCell;
       //   cellContentType = ContentType.Markdown;
       cell = event.source.activeCell;
-      this.addMessageHandler('system', 'Markdown dropped');
+      // this.addMessageHandler('system', 'Markdown dropped'); // Markdown cell not used
     }
+
+    this.chatBox.scrollTop = this.chatBox.scrollHeight; // Scroll to the bottom
 
     // Create a new tab and populate it with the corresponding cell
     // Swap the dropzone with the new tab
@@ -245,5 +292,5 @@ export class Agent implements IDisposable {
   dispose() {
     this.node.remove();
     this.isDisposed = true;
-  }    
+  }
 }
