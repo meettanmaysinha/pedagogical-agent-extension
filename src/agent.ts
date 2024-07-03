@@ -93,16 +93,16 @@ export class Agent implements IDisposable {
 
   /**
    * Adds a new message to the chat box, depending on role
-   * @param role Role of sender (user, system)
+   * @param role Role of sender (user, assistant)
    * @param message Content of message
    */
   addMessageHandler = async (role: string, message: string) => {
     const chatMessage = document.createElement('div');
     const chatRole = document.createElement('div');
     chatMessage.classList.add('chat-message');
-    if (role === 'system') {
+    if (role === 'assistant') {
       chatRole.classList.add('system-role');
-      chatRole.innerText = 'System';
+      chatRole.innerText = 'Assistant';
       chatMessage.innerText = message;
       this.chatBox.append(chatRole);
       this.chatBox.append(chatMessage);
@@ -113,22 +113,22 @@ export class Agent implements IDisposable {
       chatMessage.innerText = message;
       this.chatBox.append(chatRole);
       this.chatBox.append(chatMessage);
-      this.addMessageHandler('system', await this.queryResponse(message));
+      this.addMessageHandler('assistant', await this.queryResponse(message));
     }
   };
 
   /**
    * When user drags cell into chat box, add the code cell content into chatbox
-   * @param role Role of sender (user, system)
+   * @param role Role of sender (user, assistant)
    * @param message Content of message
    */
   addCellMessageHandler = async (role: string, cellContent: any) => {
     const chatMessage = document.createElement('div');
     const chatRole = document.createElement('div');
     chatMessage.classList.add('chat-message');
-    if (role === 'system') {
+    if (role === 'assistant') {
       chatRole.classList.add('system-role');
-      chatRole.innerText = 'System';
+      chatRole.innerText = 'Assistant';
       chatMessage.innerText = cellContent.source;
       this.chatBox.append(chatRole);
       this.chatBox.append(chatMessage);
@@ -140,7 +140,7 @@ export class Agent implements IDisposable {
       this.chatBox.append(chatRole);
       this.chatBox.append(chatMessage);
       this.addMessageHandler(
-        'system',
+        'assistant',
         await this.queryResponse(JSON.stringify(cellContent))
       );
     }
@@ -270,7 +270,7 @@ export class Agent implements IDisposable {
       //   cell = notebook.content.activeCell as MarkdownCell;
       //   cellContentType = ContentType.Markdown;
       cell = event.source.activeCell;
-      // this.addMessageHandler('system', 'Markdown dropped'); // Markdown cell not used
+      // this.addMessageHandler('assistant', 'Markdown dropped'); // Markdown cell not used
     }
 
     this.chatBox.scrollTop = this.chatBox.scrollHeight; // Scroll to the bottom
