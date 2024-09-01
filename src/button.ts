@@ -90,7 +90,7 @@ export class ButtonExtension
       className: 'sticky-button',
       iconClass: 'far fa-sticky-note',
       onClick: onClickHandler,
-      tooltip: 'Show/Hide StickyLand'
+      tooltip: 'Show/Hide Chat'
     });
 
     // const numItems = toArray(panel.toolbar.children()).length;

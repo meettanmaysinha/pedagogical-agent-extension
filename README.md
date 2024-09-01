@@ -1,6 +1,19 @@
 # URECA Pedagogical Agent Extension
 ### Made for Jupyter Lab
 
+## Introduction
+
+This is a Jupyter Lab Extension for the Pedagogical Agent, providing a user interface for the student to interact with the agent. This documentation is your comprehensive guide to understanding the components of this extension.
+
+For development, refer to the Development section at the end of this README
+
+## Key Features
+
+Here are some of the key features of the PA Extension:
+
+- **Feature 1**: Chat message input
+- **Feature 2**: Drag and drop cells to query
+
 
 ## Prerequisites
 
@@ -43,6 +56,27 @@ jupyter lab
 ```
 Changes to extension will be automatically saved. Refresh JupyterLab to apply changes.
 
+## Files
+
+### Main Folders and Classes
+    .
+    ├── docker                  # Docker file for extension (Not yet implemented - Work in Progress)
+    ├── jupyterlab_stickyland   # Extension files
+    ├── src                     # Source code for interface components
+        └── agent.ts            # Agent components like chat messages and display inputs/responses
+        └── button.ts           # Button to open/close the chat window
+        └── content.ts          # Displays the agent component
+        └── floating.ts         # Floating chat window
+        └── icons.ts            #
+        └── index.ts            # 
+        └── stickyland.ts       # Chat window for the Agent
+        └── svg.d.ts            #
+        └── tab.ts              # 
+    ├── style                   # Styling CSS files for inteface components
+    ├── build.sh                # Docker build file (Not yet implemented - Work in Progress)
+    └── run.sh                  # Run script for docker file (Not yet implemented - Work in Progress)
+
+
 ## Citation and References
 This extension was modified from [StickyLand](https://github.com/xiaohk/stickyland)
 
@@ -60,3 +94,6 @@ This extension was modified from [StickyLand](https://github.com/xiaohk/stickyla
 ## License
 
 The software is available under the [BSD-3-Clause License](https://github.com/xiaohk/stickyland/blob/master/LICENSE).
+
+
+## Development

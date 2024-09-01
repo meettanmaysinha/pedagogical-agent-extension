@@ -250,11 +250,9 @@ export class StickyLand {
   dragDropHandler = (event: IDragEvent) => {
     event.preventDefault();
     event.stopPropagation();
-    console.log('Very Happy');
     console.log(this.stickyTab);
     // Let the content handle drag drop
     if (this.stickyTab.tabContent) {
-      console.log('Happy');
       this.stickyTab.tabContent.dragDropHandler(event);
     }
   };
