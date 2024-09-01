@@ -1,8 +1,6 @@
 import { IDragEvent } from '@lumino/dragdrop';
 import { NotebookPanel } from '@jupyterlab/notebook';
 import { StickyTab } from './tab';
-import { StickyContent } from './content';
-import { FloatingWindow } from './floating';
 import { MyIcons } from './icons';
 
 const MIN_WIDTH = 235;
@@ -19,8 +17,6 @@ export class StickyLand {
   node: HTMLElement;
   header: HTMLElement;
   stickyTab: StickyTab;
-  // stickyContent: StickyContent | null = null;
-  floatingWindows: FloatingWindow[] = [];
   containerSize: ContainerPos;
 
   constructor(panel: NotebookPanel) {
@@ -221,20 +217,10 @@ export class StickyLand {
 
   hide = () => {
     this.node.classList.add('hidden');
-
-    // Also hide all floating windows
-    this.floatingWindows.forEach(d => {
-      d.node.classList.add('hidden');
-    });
   };
 
   show = () => {
     this.node.classList.remove('hidden');
-
-    // Also show all floating windows
-    this.floatingWindows.forEach(d => {
-      d.node.classList.remove('hidden');
-    });
   };
 
   /**

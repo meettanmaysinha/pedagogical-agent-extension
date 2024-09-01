@@ -63,13 +63,13 @@ Changes to extension will be automatically saved. Refresh JupyterLab to apply ch
     ├── docker                  # Docker file for extension (Not yet implemented - Work in Progress)
     ├── jupyterlab_stickyland   # Extension files
     ├── src                     # Source code for interface components
-        └── agent.ts            # Agent components like chat messages and display inputs/responses
+        └── agent.ts            # Agent components (Chat messages, display inputs/responses)
         └── button.ts           # Button to open/close the chat window
         └── content.ts          # Displays the agent component
-        └── floating.ts         # Floating chat window
-        └── icons.ts            #
-        └── index.ts            # 
-        └── stickyland.ts       # Chat window for the Agent
+        └── floating.ts         # Window to allow for resizing of the interface
+        └── icons.ts            # Different icons used for the extension
+        └── index.ts            # Collates the different components and displays button on the toolbar
+        └── stickyland.ts       # Displays the Agent in the Window
         └── svg.d.ts            #
         └── tab.ts              # 
     ├── style                   # Styling CSS files for inteface components
