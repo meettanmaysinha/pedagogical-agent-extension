@@ -1,4 +1,4 @@
-.sticky-button.jp-Button.minimal .jp-Icon {
+.main-container-button.jp-Button.minimal .jp-Icon {
   color: var(--jp-inverse-layout-color3);
 }
 
@@ -166,7 +166,7 @@
   padding: 1px 0 0 0;
 }
 
-.sticky-content {
+.agent-content {
   height: calc(100% - var(--sticky-header-height) - var(--sticky-tab-height));
   width: 100%;
   display: flex;
@@ -176,12 +176,12 @@
   z-index: 1;
 }
 
-.sticky-content .header {
+.agent-content .header {
   display: flex;
   width: 100%;
 }
 
-.sticky-content .content {
+.agent-content .content {
   flex-grow: 1;
   width: 100%;
   background-color: var(--jp-layout-color1);
@@ -193,7 +193,7 @@
   overflow: scroll;
 }
 
-.sticky-content .CodeMirror.cm-s-jupyter {
+.agent-content .CodeMirror.cm-s-jupyter {
   background: transparent;
 }
 

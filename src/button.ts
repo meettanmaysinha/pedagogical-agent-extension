@@ -9,13 +9,13 @@ import {
   INotebookModel,
   INotebookTracker
 } from '@jupyterlab/notebook';
-import { StickyLand } from './stickyland';
+import { MainContainer } from './mainContainer';
 
 export class ButtonExtension
   implements DocumentRegistry.IWidgetExtension<NotebookPanel, INotebookModel>
 {
-  // This maps each stickyLand object to a notebook title
-  stickyLandMap: Map<string, StickyLand>;
+  // This maps each mainContainer object to a notebook title
+  mainContainerMap: Map<string, MainContainer>;
   shell: JupyterFrontEnd.IShell;
   notebookTracker: INotebookTracker;
   documentManager: IDocumentManager;
@@ -26,33 +26,9 @@ export class ButtonExtension
     documentManager: IDocumentManager
   ) {
     this.shell = shell;
-    this.stickyLandMap = new Map<string, StickyLand>();
+    this.mainContainerMap = new Map<string, MainContainer>();
     this.notebookTracker = notebookTracker;
     this.documentManager = documentManager;
-
-    // Listen to the notebook tracker to update stickyLandMap when a user closes
-    // a notebook
-    this.notebookTracker.currentChanged.connect((sender, panel) => {
-      setTimeout(() => {
-        const widgetIter = this.shell.widgets();
-        const openPaths: Set<string> = new Set();
-        let nextWidget = widgetIter.next();
-        while (nextWidget !== undefined) {
-          const context = this.documentManager.contextForWidget(nextWidget);
-          if (context !== undefined) {
-            openPaths.add(context.path);
-          }
-          nextWidget = widgetIter.next();
-        }
-
-        // Remove stickylands where their associated notebooks are closed
-        for (const path of this.stickyLandMap.keys()) {
-          if (!openPaths.has(path)) {
-            this.stickyLandMap.delete(path);
-          }
-        }
-      }, 500);
-    });
   }
 
   createNew(
@@ -63,31 +39,26 @@ export class ButtonExtension
      * Handler for the click event.
      */
     const onClickHandler = () => {
-      // Check if we have already created stickyland
+      // Check if we have already created main container
       const curPath = context.path;
 
       // Create it if we don't have it yet
-      if (!this.stickyLandMap?.has(curPath)) {
-        this.stickyLandMap?.set(curPath, new StickyLand(panel));
+      if (!this.mainContainerMap?.has(curPath)) {
+        this.mainContainerMap?.set(curPath, new MainContainer(panel));
       }
 
-      const curStickyLand = this.stickyLandMap?.get(curPath);
+      const curMainContainer = this.mainContainerMap?.get(curPath);
 
       // Check if we should show or hide this container
-      if (curStickyLand?.isHidden()) {
-        curStickyLand?.show();
+      if (curMainContainer?.isHidden()) {
+        curMainContainer?.show();
       } else {
-        curStickyLand?.hide();
+        curMainContainer?.hide();
       }
-
-      // Alternative way to insert StickyLand to the notebook widget (boxLayout)
-      // const stickyLand = new StickyLand();
-      // const panelLayout = panel.layout as BoxLayout;
-      // panelLayout.addWidget(stickyLand);
     };
 
     const button = new ToolbarButton({
-      className: 'sticky-button',
+      className: 'main-container-button',
       iconClass: 'far fa-sticky-note',
       onClick: onClickHandler,
       tooltip: 'Show/Hide Chat'
@@ -95,7 +66,7 @@ export class ButtonExtension
 
     // const numItems = toArray(panel.toolbar.children()).length;
     const insertIndex = 10;
-    panel.toolbar.insertItem(insertIndex, 'stickyLand', button);
+    panel.toolbar.insertItem(insertIndex, 'mainContainer', button);
 
     return new DisposableDelegate(() => {
       button.dispose();

@@ -3,7 +3,7 @@ import { NotebookActions } from '@jupyterlab/notebook';
 import { NotebookPanel, Notebook } from '@jupyterlab/notebook';
 import { Cell, ICellModel } from '@jupyterlab/cells';
 import { StickyContent } from './content';
-import { StickyLand } from './stickyland';
+import { MainContainer } from './mainContainer';
 import { ContentType } from './content';
 import { MyIcons } from './icons';
 
@@ -15,9 +15,9 @@ export type Tab = {
   hasNewUpdate: boolean;
 };
 
-export class StickyTab implements IDisposable {
+export class ContentTab implements IDisposable {
   stickyContainer: HTMLElement;
-  stickyLand: StickyLand;
+  mainContainer: MainContainer;
   notebook: NotebookPanel;
   tabContent: StickyContent;
   activeTab: Tab | null = null;
@@ -30,11 +30,11 @@ export class StickyTab implements IDisposable {
   constructor(
     stickyContainer: HTMLElement,
     panel: NotebookPanel,
-    stickyLand: StickyLand
+    mainContainer: MainContainer
   ) {
     console.log('Tab Constructed');
     this.stickyContainer = stickyContainer;
-    this.stickyLand = stickyLand;
+    this.mainContainer = mainContainer;
     this.notebook = panel;
 
     // Create the first tab
@@ -57,7 +57,7 @@ export class StickyTab implements IDisposable {
     const tabContent = new StickyContent(
       this.stickyContainer,
       this.notebook,
-      this.stickyLand
+      this.mainContainer
     );
 
     // Add this tab to the model and view

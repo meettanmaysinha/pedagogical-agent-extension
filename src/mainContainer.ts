@@ -1,6 +1,6 @@
 import { IDragEvent } from '@lumino/dragdrop';
 import { NotebookPanel } from '@jupyterlab/notebook';
-import { StickyTab } from './tab';
+import { ContentTab } from './tab';
 import { MyIcons } from './icons';
 
 const MIN_WIDTH = 235;
@@ -13,14 +13,14 @@ type ContainerPos = {
   y: number;
 };
 
-export class StickyLand {
+export class MainContainer {
   node: HTMLElement;
   header: HTMLElement;
-  stickyTab: StickyTab;
+  contentTab: ContentTab;
   containerSize: ContainerPos;
 
   constructor(panel: NotebookPanel) {
-    console.log('Stickyland Constructed');
+    console.log('Main Container Constructed');
     this.node = document.createElement('div');
     this.node.classList.add('sticky-container', 'hidden');
 
@@ -29,13 +29,13 @@ export class StickyLand {
     this.header.classList.add('sticky-header');
     this.node.appendChild(this.header);
 
-    // Put stickyland below the toolbar
+    // Put main container below the toolbar
     const toolbarHeight = parseFloat(panel.toolbar.node.style.height);
     this.node.style.top = `${toolbarHeight + 30}px`;
     panel.node.appendChild(this.node);
 
     // Add the tab element
-    this.stickyTab = new StickyTab(this.node, panel, this);
+    this.contentTab = new ContentTab(this.node, panel, this);
 
     // Bound the window position inside its parent when dragging the header
     if (this.node.parentElement) {
@@ -46,7 +46,7 @@ export class StickyLand {
         y: containerBBox.y
       };
     } else {
-      console.warn('Could not find stickyland container parent.');
+      console.warn('Could not find main container parent.');
       this.containerSize = {
         width: 2000,
         height: 1500,
@@ -156,7 +156,7 @@ export class StickyLand {
   };
 
   /**
-   * Style the header so that users can reposition StickyLand.
+   * Style the header so that users can reposition Main Container.
    */
   initHeader = () => {
     // Add the drag icon
@@ -165,8 +165,7 @@ export class StickyLand {
     this.header.appendChild(dragHandle);
     MyIcons.dragIcon.element({ container: dragHandle });
 
-    // Allow the user to drag the header to change the vertical position of
-    // stickyland
+    // Allow the user to drag the header to change the vertical position of the Main Container
     this.header.addEventListener('mousedown', this.headerMousedownHandler);
   };
 
@@ -236,10 +235,10 @@ export class StickyLand {
   dragDropHandler = (event: IDragEvent) => {
     event.preventDefault();
     event.stopPropagation();
-    console.log(this.stickyTab);
+    console.log(this.contentTab);
     // Let the content handle drag drop
-    if (this.stickyTab.tabContent) {
-      this.stickyTab.tabContent.dragDropHandler(event);
+    if (this.contentTab.tabContent) {
+      this.contentTab.tabContent.dragDropHandler(event);
     }
   };
 
@@ -258,8 +257,8 @@ export class StickyLand {
     event.stopPropagation();
 
     // Change the view of content
-    if (this.stickyTab.tabContent) {
-      this.stickyTab.tabContent.dragEnterHandler(event);
+    if (this.contentTab.tabContent) {
+      this.contentTab.tabContent.dragEnterHandler(event);
     }
   };
 
@@ -285,8 +284,8 @@ export class StickyLand {
     event.dropAction = 'copy';
 
     // Change the view of content
-    if (this.stickyTab.tabContent) {
-      this.stickyTab.tabContent.dragOverHandler(event);
+    if (this.contentTab.tabContent) {
+      this.contentTab.tabContent.dragOverHandler(event);
     }
   };
 
@@ -305,8 +304,8 @@ export class StickyLand {
     event.stopPropagation();
 
     // Change the view of content
-    if (this.stickyTab.tabContent) {
-      this.stickyTab.tabContent.dragLeaveHandler(event);
+    if (this.contentTab.tabContent) {
+      this.contentTab.tabContent.dragLeaveHandler(event);
     }
   };
 }

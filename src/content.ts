@@ -4,7 +4,7 @@ import { NotebookPanel } from '@jupyterlab/notebook';
 import { CodeCell, MarkdownCell, Cell } from '@jupyterlab/cells';
 
 import { Agent } from './agent';
-import { StickyLand } from './stickyland';
+import { MainContainer } from './mainContainer';
 
 export enum ContentType {
   Agent = 'Agent',
@@ -12,30 +12,30 @@ export enum ContentType {
   Markdown = 'Markdown'
 }
 
-export class StickyContent implements IDisposable {
-  stickyContainer: HTMLElement;
+export class AgentContent implements IDisposable {
+  parentContainer: HTMLElement;
   wrapperNode: HTMLElement;
   headerNode: HTMLElement;
   contentNode: HTMLElement;
   agent: Agent;
   notebook: NotebookPanel;
-  stickyLand: StickyLand;
+  mainContainer: MainContainer;
   isDisposed = false;
 
   constructor(
-    stickyContainer: HTMLElement,
+    parentContainer: HTMLElement,
     panel: NotebookPanel,
-    stickyLand: StickyLand
+    mainContainer: MainContainer
   ) {
-    console.log('Sticky Content Constructed');
-    this.stickyContainer = stickyContainer;
+    console.log('Agent Content Constructed');
+    this.parentContainer = parentContainer;
     this.notebook = panel;
-    this.stickyLand = stickyLand;
+    this.mainContainer = mainContainer;
 
     // Add the content element
     this.wrapperNode = document.createElement('div');
-    this.wrapperNode.classList.add('sticky-content');
-    this.stickyContainer.appendChild(this.wrapperNode);
+    this.wrapperNode.classList.add('agent-content');
+    this.parentContainer.appendChild(this.wrapperNode);
 
     // Add a header and a content
     this.headerNode = document.createElement('div');

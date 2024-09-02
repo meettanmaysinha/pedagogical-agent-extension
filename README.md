@@ -66,12 +66,11 @@ Changes to extension will be automatically saved. Refresh JupyterLab to apply ch
         └── agent.ts            # Agent components (Chat messages, display inputs/responses)
         └── button.ts           # Button to open/close the chat window
         └── content.ts          # Displays the agent component
-        └── floating.ts         # Window to allow for resizing of the interface
         └── icons.ts            # Different icons used for the extension
         └── index.ts            # Collates the different components and displays button on the toolbar
-        └── stickyland.ts       # Displays the Agent in the Window
+        └── contentContainer.ts       # Displays the Agent in the Window
         └── svg.d.ts            #
-        └── tab.ts              # 
+        └── tab.ts              # Container for the stickyland window
     ├── style                   # Styling CSS files for inteface components
     ├── build.sh                # Docker build file (Not yet implemented - Work in Progress)
     └── run.sh                  # Run script for docker file (Not yet implemented - Work in Progress)
