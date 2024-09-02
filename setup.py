@@ -1,5 +1,5 @@
 """
-jupyterlab_stickyland setup
+jupyterlab_pedagogical_agent setup
 """
 import json
 import sys
@@ -10,14 +10,14 @@ import setuptools
 HERE = Path(__file__).parent.resolve()
 
 # The name of the project
-name = "jupyterlab_stickyland"
+name = "jupyterlab_pedagogical_agent"
 
 lab_path = HERE / name.replace("-", "_") / "labextension"
 
 # Representative files that should exist after a successful build
 ensured_targets = [str(lab_path / "package.json"), str(lab_path / "static/style.js")]
 
-labext_name = "jupyterlab-stickyland"
+labext_name = "jupyterlab-pedagogical_agent"
 
 data_files_spec = [
     (

@@ -5,7 +5,7 @@ import { ButtonExtension } from './button';
 import { INotebookTracker, NotebookPanel } from '@jupyterlab/notebook';
 
 const plugin = {
-  id: 'jupyterlab_stickyland',
+  id: 'jupyterlab_pedagogical_agent',
   autoStart: true,
   requires: [INotebookTracker, IDocumentManager],
   activate: function (
@@ -13,7 +13,7 @@ const plugin = {
     notebookTracker: INotebookTracker,
     documentManager: IDocumentManager
   ) {
-    console.log('Activating StickyLand.');
+    console.log('Activating Padagogical Agent Extension.');
 
     app.docRegistry.addWidgetExtension(
       'Notebook',
