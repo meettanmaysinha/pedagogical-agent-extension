@@ -22,11 +22,11 @@ export class MainContainer {
   constructor(panel: NotebookPanel) {
     console.log('Main Container Constructed');
     this.node = document.createElement('div');
-    this.node.classList.add('sticky-container', 'hidden');
+    this.node.classList.add('main-container', 'hidden');
 
     // Create a header so that users can drag
     this.header = document.createElement('div');
-    this.header.classList.add('sticky-header');
+    this.header.classList.add('main-container-header');
     this.node.appendChild(this.header);
 
     // Put main container below the toolbar
