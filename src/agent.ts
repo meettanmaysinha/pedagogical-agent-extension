@@ -2,7 +2,7 @@ import { IDisposable } from '@lumino/disposable';
 import { IDragEvent } from '@lumino/dragdrop';
 import { NotebookPanel } from '@jupyterlab/notebook';
 import { CodeCell, MarkdownCell, Cell } from '@jupyterlab/cells';
-import { StickyContent, ContentType } from './content';
+import { AgentContent, ContentType } from './content';
 import { MyIcons } from './icons';
 import axios from 'axios';
 
@@ -11,7 +11,7 @@ import axios from 'axios';
  * and waiting for users to drop some cells.
  */
 export class Agent implements IDisposable {
-  stickyContent: StickyContent;
+  agentContent: AgentContent;
   node: HTMLElement;
   isDisposed = false;
   chatBox: HTMLElement;
@@ -20,14 +20,14 @@ export class Agent implements IDisposable {
   doseReceiveDrop: boolean;
   static numDz = 0;
 
-  constructor(stickyContent: StickyContent) {
+  constructor(agentContent: AgentContent) {
     console.log('Agent constructed');
-    this.stickyContent = stickyContent;
+    this.agentContent = agentContent;
 
     // Add an agent element
     this.node = document.createElement('div');
     this.node.classList.add('agent');
-    this.stickyContent.contentNode.append(this.node);
+    this.agentContent.contentNode.append(this.node);
 
     // Add a chat box
     this.chatBox = document.createElement('span') as HTMLElement;
@@ -274,10 +274,6 @@ export class Agent implements IDisposable {
     }
 
     this.chatBox.scrollTop = this.chatBox.scrollHeight; // Scroll to the bottom
-
-    // Create a new tab and populate it with the corresponding cell
-    // Swap the dropzone with the new tab
-    // this.stickyContent.swapDropzoneWithExistingCell(cell, cellContentType);
   };
 
   /**

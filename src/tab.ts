@@ -2,7 +2,7 @@ import { IDisposable } from '@lumino/disposable';
 import { NotebookActions } from '@jupyterlab/notebook';
 import { NotebookPanel, Notebook } from '@jupyterlab/notebook';
 import { Cell, ICellModel } from '@jupyterlab/cells';
-import { StickyContent } from './content';
+import { AgentContent } from './content';
 import { MainContainer } from './mainContainer';
 import { ContentType } from './content';
 import { MyIcons } from './icons';
@@ -11,7 +11,7 @@ export type Tab = {
   cellType: ContentType;
   cellIndex: number;
   tabNode: HTMLElement;
-  tabContent: StickyContent;
+  tabContent: AgentContent;
   hasNewUpdate: boolean;
 };
 
@@ -19,7 +19,7 @@ export class ContentTab implements IDisposable {
   stickyContainer: HTMLElement;
   mainContainer: MainContainer;
   notebook: NotebookPanel;
-  tabContent: StickyContent;
+  tabContent: AgentContent;
   activeTab: Tab | null = null;
 
   autoRunTimeout: number | null = null;
@@ -54,7 +54,7 @@ export class ContentTab implements IDisposable {
     tabNode.setAttribute('title', 'New tab');
 
     // New tab always has the dropzone content
-    const tabContent = new StickyContent(
+    const tabContent = new AgentContent(
       this.stickyContainer,
       this.notebook,
       this.mainContainer
