@@ -52,7 +52,7 @@ jobs:
           jlpm run eslint:check
           python -m pip install .
 
-          jupyter labextension list 2>&1 | grep -ie "jupyterlab-stickyland.*OK"
+          jupyter labextension list 2>&1 | grep -ie "jupyterlab-pedagogical-agent.*OK"
           python -m jupyterlab.browser_check
 
           check-manifest -v
@@ -92,4 +92,4 @@ jobs:
           pip install myextension.tar.gz
           pip install "jupyterlab<4"
           python -m jupyterlab.browser_check --no-chrome-test
-          jupyter labextension list 2>&1 | grep -ie "jupyterlab-stickyland.*OK"
+          jupyter labextension list 2>&1 | grep -ie "jupyterlab-pedagogical-agent.*OK"

@@ -68,9 +68,9 @@ Changes to extension will be automatically saved. Refresh JupyterLab to apply ch
         └── content.ts          # Displays the agent component
         └── icons.ts            # Different icons used for the extension
         └── index.ts            # Collates the different components and displays button on the toolbar
-        └── contentContainer.ts       # Displays the Agent in the Window
+        └── mainContainer.ts    # Displays the Agent in the Window
         └── svg.d.ts            #
-        └── tab.ts              # Container for the stickyland window
+        └── tab.ts              # Container inside the mainContainer window
     ├── style                   # Styling CSS files for inteface components
     ├── build.sh                # Docker build file (Not yet implemented - Work in Progress)
     └── run.sh                  # Run script for docker file (Not yet implemented - Work in Progress)
@@ -92,7 +92,7 @@ This extension was modified from [StickyLand](https://github.com/xiaohk/stickyla
 
 ## License
 
-The software is available under the [BSD-3-Clause License](https://github.com/xiaohk/stickyland/blob/master/LICENSE).
+<!-- The software is available under the [BSD-3-Clause License](https://github.com/xiaohk/stickyland/blob/master/LICENSE). -->
 
 
 ## Development

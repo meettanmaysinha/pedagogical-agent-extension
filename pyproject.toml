@@ -3,10 +3,10 @@ requires = ["jupyter_packaging~=0.10,<2", "jupyterlab<4"]
 build-backend = "jupyter_packaging.build_api"
 
 [tool.jupyter-packaging.options]
-skip-if-exists = ["jupyterlab_stickyland/labextension/static/style.js"]
+skip-if-exists = ["jupyterlab_pedagogical_agent/labextension/static/style.js"]
 ensured-targets = [
-  "jupyterlab_stickyland/labextension/static/style.js",
-  "jupyterlab_stickyland/labextension/package.json",
+  "jupyterlab_pedagogical_agent/labextension/static/style.js",
+  "jupyterlab_pedagogical_agent/labextension/package.json",
 ]
 
 [tool.jupyter-packaging.builder]
@@ -18,7 +18,7 @@ npm = ["jlpm"]
 
 [tool.check-manifest]
 ignore = [
-  "jupyterlab_stickyland/labextension/**",
+  "jupyterlab_pedagogical_agent/labextension/**",
   "yarn.lock",
   ".*",
   "package-lock.json",

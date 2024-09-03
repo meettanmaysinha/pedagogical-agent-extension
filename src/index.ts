@@ -13,7 +13,7 @@ const plugin = {
     notebookTracker: INotebookTracker,
     documentManager: IDocumentManager
   ) {
-    console.log('Activating Padagogical Agent Extension.');
+    console.log('Activating Pedagogical Agent Extension.');
 
     app.docRegistry.addWidgetExtension(
       'Notebook',

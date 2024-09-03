@@ -10,7 +10,7 @@ include install.json
 include ts*.json
 include yarn.lock
 
-graft jupyterlab_stickyland/labextension
+graft jupyterlab_pedagogical_agent/labextension
 
 # Javascript files
 graft src

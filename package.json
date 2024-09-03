@@ -1,20 +1,20 @@
 {
-  "name": "jupyterlab-stickyland",
+  "name": "jupyterlab-pedagogical-agent",
   "version": "0.2.4",
-  "description": "Break free from the linear presentation of Jupyter Notebooks with sticky cells!",
+  "description": "Pedagogical Agent extension for JupyterLab",
   "keywords": [
     "jupyter",
     "jupyterlab",
     "jupyterlab-extension"
   ],
-  "homepage": "https://github.com/xiaohk/stickyland",
+  "homepage": "https://github.com/chengyaolee/pedagogical-agent-extension",
   "bugs": {
-    "url": "https://github.com/xiaohk/stickyland/issues"
+    "url": "https://github.com/chengyaolee/pedagogical-agent-extension/issues"
   },
   "license": "BSD-3-Clause",
   "author": {
-    "name": "Jay Wang, Katie Dai",
-    "email": "jay@zijie.wang, kdai7@gatech.edu"
+    "name": "",
+    "email": ""
   },
   "files": [
     "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",
@@ -26,7 +26,7 @@
   "style": "style/index.css",
   "repository": {
     "type": "git",
-    "url": "https://github.com/xiaohk/stickyland.git"
+    "url": "https://github.com/chengyaolee/.github"
   },
   "scripts": {
     "build": "jlpm run build:lib && jlpm run build:labextension:dev",
@@ -36,7 +36,7 @@
     "build:lib": "tsc",
     "clean": "jlpm run clean:lib",
     "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
-    "clean:labextension": "rimraf jupyterlab_stickyland/labextension",
+    "clean:labextension": "rimraf jupyterlab_pedagogical_agent/labextension",
     "clean:all": "jlpm run clean:lib && jlpm run clean:labextension",
     "eslint": "eslint . --ext .ts,.tsx --fix",
     "eslint:check": "eslint . --ext .ts,.tsx",
@@ -74,7 +74,7 @@
   },
   "jupyterlab": {
     "extension": true,
-    "outputDir": "jupyterlab_stickyland/labextension"
+    "outputDir": "jupyterlab_pedagogical_agent/labextension"
   },
   "jupyter-releaser": {
     "hooks": {
