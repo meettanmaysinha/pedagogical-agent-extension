@@ -7,7 +7,7 @@ import { MyIcons } from './icons';
 import axios from 'axios';
 
 /**
- * Class that implements the Agent state where the StickyContent is empty
+ * Class that implements the Agent state where the AgentContent is empty
  * and waiting for users to drop some cells.
  */
 export class Agent implements IDisposable {

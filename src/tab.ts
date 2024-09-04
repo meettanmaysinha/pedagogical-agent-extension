@@ -16,7 +16,7 @@ export type Tab = {
 };
 
 export class ContentTab implements IDisposable {
-  stickyContainer: HTMLElement;
+  parentContainer: HTMLElement;
   mainContainer: MainContainer;
   notebook: NotebookPanel;
   tabContent: AgentContent;
@@ -28,12 +28,12 @@ export class ContentTab implements IDisposable {
   isDisposed = false;
 
   constructor(
-    stickyContainer: HTMLElement,
+    parentContainer: HTMLElement,
     panel: NotebookPanel,
     mainContainer: MainContainer
   ) {
     console.log('Tab Constructed');
-    this.stickyContainer = stickyContainer;
+    this.parentContainer = parentContainer;
     this.mainContainer = mainContainer;
     this.notebook = panel;
 
@@ -55,7 +55,7 @@ export class ContentTab implements IDisposable {
 
     // New tab always has the dropzone content
     const tabContent = new AgentContent(
-      this.stickyContainer,
+      this.parentContainer,
       this.notebook,
       this.mainContainer
     );
