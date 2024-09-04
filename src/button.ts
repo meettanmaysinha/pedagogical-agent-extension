@@ -59,7 +59,7 @@ export class ButtonExtension
 
     const button = new ToolbarButton({
       className: 'main-container-button',
-      iconClass: 'far fa-sticky-note',
+      iconClass: 'fas fa-chalkboard-teacher',
       onClick: onClickHandler,
       tooltip: 'Show/Hide Chat'
     });

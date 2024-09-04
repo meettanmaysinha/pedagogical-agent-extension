@@ -43,7 +43,7 @@ jupyter labextension develop . --overwrite
 jlpm run build
 ```
 
-## Running the Extension
+## Developing the Extension
 Run the following 2 commands in **different** terminals
 ```bash
 # Run the extension in one terminal
@@ -55,6 +55,8 @@ jlpm run watch
 jupyter lab
 ```
 Changes to extension will be automatically saved. Refresh JupyterLab to apply changes.
+
+Note: There will be 2 icons in the toolbar, the one on the left will be for development, where changes are automatically saved and updated through `jlpm run watch`, while the icon on the right will not be updated, as it is built upon launching of the extension
 
 ## Files
 
