@@ -6,7 +6,6 @@ node_modules/
 .ipynb_checkpoints
 *.tsbuildinfo
 jupyterlab_pedagogical_agent/labextension
-jupyterlab_stickyland/labextension
 yarn.lock
 package-lock.json
 *.swp
