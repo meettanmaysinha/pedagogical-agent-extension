@@ -110,3 +110,7 @@ To be developed/improved:
 - Currently there are a few layers of components and containers
   - `Agent` < `Content` < `ContentTab` < `mainContainer`
   - It could be cleaner to remove `ContentTab` to reduce the number of layers
+
+#### Docker (Not yet developed)
+- Undeveloped docker file
+  - Files: *`./run.sh`*,  *`./docker/Dockerfile`*
