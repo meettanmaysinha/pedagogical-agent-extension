@@ -79,7 +79,7 @@ Note: There will be 2 icons in the toolbar, the one on the left will be for deve
 
 
 ## Citation and References
-This extension was modified from [StickyLand](https://github.com/xiaohk/stickyland)
+This extension was developed with reference to [StickyLand](https://github.com/xiaohk/stickyland)
 
 ```bibTeX
 @inproceedings{wangStickyLandBreakingLinear2022,
@@ -94,7 +94,19 @@ This extension was modified from [StickyLand](https://github.com/xiaohk/stickyla
 
 ## License
 
-<!-- The software is available under the [BSD-3-Clause License](https://github.com/xiaohk/stickyland/blob/master/LICENSE). -->
+The software is available under the [BSD-3-Clause License](https://github.com/xiaohk/stickyland/blob/master/LICENSE).
 
 
 ## Development
+For development of the extension, the react components are inside src folder. Files are in TypeScript format and developed through DOM.
+
+To be developed/improved:
+
+#### UI/UX of the chat interface
+- Currently the interface is simple, without design/formatting of the texts
+  - Markdown could be used to display instead of using TextArea element for the chat
+
+#### Structure of the components
+- Currently there are a few layers of components and containers
+  - `Agent` < `Content` < `ContentTab` < `mainContainer`
+  - It could be cleaner to remove `ContentTab` to reduce the number of layers
