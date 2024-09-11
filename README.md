@@ -3,7 +3,7 @@
 
 ## Introduction
 
-This is a Jupyter Lab Extension for the Pedagogical Agent, providing a user interface for the student to interact with the agent. This documentation is your comprehensive guide to understanding the components of this extension.
+This is a Jupyter Lab Extension for the Pedagogical Agent (PA), providing a user interface for a student to interact with the agent. This documentation is your comprehensive guide to understanding the components of this extension.
 
 For development, refer to the Development section at the end of this README
 
