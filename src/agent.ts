@@ -6,6 +6,7 @@ import { AgentContent, ContentType } from './content';
 import { MyIcons } from './icons';
 import axios from 'axios';
 
+
 /**
  * Class that implements the Agent state where the AgentContent is empty
  * and waiting for users to drop some cells.
@@ -35,6 +36,7 @@ export class Agent implements IDisposable {
     this.node.append(this.chatBox);
 
     this.doseReceiveDrop = false;
+
 
     if (this.node.getElementsByClassName('agent-chat-box').length === 0) {
       // Initialize the content
@@ -74,11 +76,11 @@ export class Agent implements IDisposable {
 
     this.chatInput = document.createElement('textarea') as HTMLTextAreaElement;
     this.chatInput.classList.add('agent-chat-input');
+    this.chatInput.style.height='50px';
     chatContainer.append(this.chatInput);
 
     // Auto resize textarea based on content
     this.chatInput.addEventListener('input', function () {
-      this.style.height = '22px';
       this.style.height = this.scrollHeight + 'px';
     });
 
@@ -122,28 +124,11 @@ export class Agent implements IDisposable {
    * @param role Role of sender (user, assistant)
    * @param message Content of message
    */
-  addCellMessageHandler = async (role: string, cellContent: any) => {
-    const chatMessage = document.createElement('div');
-    const chatRole = document.createElement('div');
-    chatMessage.classList.add('chat-message');
-    if (role === 'assistant') {
-      chatRole.classList.add('system-role');
-      chatRole.innerText = 'Assistant';
-      chatMessage.innerText = cellContent.source;
-      this.chatBox.append(chatRole);
-      this.chatBox.append(chatMessage);
-      // this.streamChat(message, 0, chatMessage); // To be implemented if using streaming
-    } else if (role === 'user') {
-      chatRole.classList.add('user-role');
-      chatRole.innerText = 'You';
-      chatMessage.innerText = cellContent.source;
-      this.chatBox.append(chatRole);
-      this.chatBox.append(chatMessage);
-      this.addMessageHandler(
-        'assistant',
-        await this.queryResponse(JSON.stringify(cellContent))
-      );
-    }
+  addCellMessageHandler = async ( cellContent: any) => {
+    var newLine = ""
+    if (this.chatInput.value != "") newLine ="\n"
+    this.chatInput.value += newLine + cellContent.source;
+    this.chatInput.scrollTop = this.chatInput.scrollHeight;
   };
 
   // // Function to simulate streaming chat effect
@@ -265,7 +250,7 @@ export class Agent implements IDisposable {
         execution_count: cellInformation.execution_count, // Number of times cell was executed
         outputs: cellInformation.outputs // Output information - Shows error details if cell has error
       };
-      this.addCellMessageHandler('user', extractedCellInfo);
+      this.addCellMessageHandler(extractedCellInfo);
     } else {
       //   cell = notebook.content.activeCell as MarkdownCell;
       //   cellContentType = ContentType.Markdown;
