@@ -33,6 +33,7 @@ export class Agent implements IDisposable {
     // Add a chat box
     this.chatBox = document.createElement('span') as HTMLElement;
     this.chatBox.classList.add('agent-chat-box');
+  
     this.node.append(this.chatBox);
 
     this.doseReceiveDrop = false;
@@ -76,11 +77,11 @@ export class Agent implements IDisposable {
 
     this.chatInput = document.createElement('textarea') as HTMLTextAreaElement;
     this.chatInput.classList.add('agent-chat-input');
-    this.chatInput.style.height='50px';
     chatContainer.append(this.chatInput);
 
     // Auto resize textarea based on content
     this.chatInput.addEventListener('input', function () {
+      this.style.height = 'auto';
       this.style.height = this.scrollHeight + 'px';
     });
 
