@@ -5,7 +5,7 @@ import { CodeCell, MarkdownCell, Cell } from '@jupyterlab/cells';
 import { AgentContent, ContentType } from './content';
 import { MyIcons } from './icons';
 import axios from 'axios';
-
+import { getCellErrorCount } from './errorTracker';
 
 /**
  * Class that implements the Agent state where the AgentContent is empty
@@ -20,6 +20,7 @@ export class Agent implements IDisposable {
   chatButton: HTMLButtonElement;
   doseReceiveDrop: boolean;
   static numDz = 0;
+  currentCellMetadata: any = null;
 
   constructor(agentContent: AgentContent) {
     console.log('Agent constructed');
@@ -33,11 +34,10 @@ export class Agent implements IDisposable {
     // Add a chat box
     this.chatBox = document.createElement('span') as HTMLElement;
     this.chatBox.classList.add('agent-chat-box');
-  
+
     this.node.append(this.chatBox);
 
     this.doseReceiveDrop = false;
-
 
     if (this.node.getElementsByClassName('agent-chat-box').length === 0) {
       // Initialize the content
@@ -125,9 +125,9 @@ export class Agent implements IDisposable {
    * @param role Role of sender (user, assistant)
    * @param message Content of message
    */
-  addCellMessageHandler = async ( cellContent: any) => {
-    var newLine = ""
-    if (this.chatInput.value != "") newLine ="\n"
+  addCellMessageHandler = async (cellContent: any) => {
+    var newLine = '';
+    if (this.chatInput.value != '') newLine = '\n';
     this.chatInput.value += newLine + cellContent.source;
     this.chatInput.scrollTop = this.chatInput.scrollHeight;
   };
@@ -156,6 +156,25 @@ export class Agent implements IDisposable {
     console.log('Querying...');
     const agentAPIEndPoint = 'http://localhost:8000/api/chat';
 
+    // Append error count to message, if available
+    if (this.currentCellMetadata !== null) {
+      content += ` \n\n\nContext: \nError count: ${this.currentCellMetadata.error_count}`;
+      if (this.currentCellMetadata.outputs !== null) {
+        // Find the first error output (if any)
+        const errorOutput = this.currentCellMetadata.outputs.find(
+          (output: any) => output.output_type === 'error'
+        );
+
+        if (errorOutput) {
+          const errorName = errorOutput.ename; // "ModuleNotFoundError"
+          const errorValue = errorOutput.evalue; // "No module named 'pandas'"
+
+          content += ` \nError description: ${errorName}: ${errorValue}`;
+        }
+      }
+    }
+
+    console.log(`Querying with: \n${content}`);
     const agentResponse = await axios.post(agentAPIEndPoint, {
       message_content: content
     });
@@ -173,10 +192,24 @@ export class Agent implements IDisposable {
       event.preventDefault(); // Prevent line break
       // Get the message from the input box and add to chat box
       const message = this.chatInput.value;
+
+      // Console logs for debug
+      // console.log(`Query: ${message}`);
+
+      // if (this.currentCellMetadata !== null) {
+      //   console.log(
+      //     `Current cell error count: ${this.currentCellMetadata.error_count}`
+      //   );
+      // }
+      // console.log(`Full log:${JSON.stringify(this.currentCellMetadata)}`);
+
       this.chatInput.value = '';
       this.chatInput.style.height = ''; // Return input box to original size
       this.addMessageHandler('user', message);
       this.chatBox.scrollTop = this.chatBox.scrollHeight; // Scroll to the bottom
+
+      // Reset metadata
+      this.currentCellMetadata = null;
     }
   };
 
@@ -187,10 +220,24 @@ export class Agent implements IDisposable {
   buttonClickHandler = (event: MouseEvent) => {
     // Get the message from the input box and add to chat box
     const message = this.chatInput.value;
+
+    // Console logs for debug
+    // console.log(`Query: ${message}`);
+
+    // if (this.currentCellMetadata !== null) {
+    //   console.log(
+    //     `Current cell error count: ${this.currentCellMetadata.error_count}`
+    //   );
+    //   console.log(`Full log:${JSON.stringify(this.currentCellMetadata)}`);
+    // }
+
     this.chatInput.value = '';
     this.chatInput.style.height = ''; // Return input box to original size
     this.addMessageHandler('user', message);
     this.chatBox.scrollTop = this.chatBox.scrollHeight; // Scroll to the bottom
+
+    // Reset metadata
+    this.currentCellMetadata = null;
   };
 
   /**
@@ -245,12 +292,22 @@ export class Agent implements IDisposable {
       //   cell = event.source.activeCell;
       //   const cellInformation = JSON.stringify(this.getDroppedCellInfo(event.source.activeCell));
       const cellInformation = cell.model.toJSON();
+
+      // Get the error count for this cell
+      const cellId = cell.model.id;
+      const cellErrorCount = getCellErrorCount(cellId);
+
       const extractedCellInfo = {
         id: cellInformation.id, // id of cell
         source: cellInformation.source, // Content inside the cell
         execution_count: cellInformation.execution_count, // Number of times cell was executed
-        outputs: cellInformation.outputs // Output information - Shows error details if cell has error
+        outputs: cellInformation.outputs, // Output information - Shows error details if cell has error
+        error_count: cellErrorCount // Number of errors so far in the cell
       };
+
+      // Store the current cell metadata
+      this.currentCellMetadata = extractedCellInfo;
+
       this.addCellMessageHandler(extractedCellInfo);
     } else {
       //   cell = notebook.content.activeCell as MarkdownCell;
