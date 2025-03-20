@@ -6,6 +6,8 @@ let executionErrorCount = 0;
 
 // Map to track errors per cell
 const cellErrorCounts = new Map<string, number>();
+const lastErrorTimestamps = new Map<string, number>();
+const errorIntervals = new Map<string, number>();
 
 // WeakSet to track processed cells
 const processedCells = new WeakSet<CodeCell>();
@@ -24,7 +26,7 @@ export function trackCellErrors(codeCell: CodeCell): void {
 
   const cellId = codeCell.model.id;
 
-  // Initialize error count for this cell
+  // Initialize error count and timestamps for this cell
   if (!cellErrorCounts.has(cellId)) {
     cellErrorCounts.set(cellId, 0);
   }
@@ -40,6 +42,15 @@ export function trackCellErrors(codeCell: CodeCell): void {
         const outputData = newOutput.toJSON();
 
         if (outputData && outputData.output_type === 'error') {
+          const currentTime = Date.now();
+
+          // Track error timestamps and intervals
+          if (lastErrorTimestamps.has(cellId)) {
+            const lastTime = lastErrorTimestamps.get(cellId)!;
+            errorIntervals.set(cellId, currentTime - lastTime);
+          }
+          lastErrorTimestamps.set(cellId, currentTime);
+
           // Increment global and cell-specific error counts
           executionErrorCount++;
           const currentCellErrors = cellErrorCounts.get(cellId) || 0;
@@ -49,14 +60,23 @@ export function trackCellErrors(codeCell: CodeCell): void {
           console.log(
             `Cell ${cellId} Error Count: ${cellErrorCounts.get(cellId)}`
           );
+          console.log(
+            `Cell ${cellId} Time Since Last Error: ${
+              errorIntervals.has(cellId)
+                ? (errorIntervals.get(cellId)! / 1000).toFixed(2)
+                : 'not available'
+            } seconds`
+          );
 
           // Add UI indication (optional)
           codeCell.node.classList.add('has-execution-error');
         } else {
-          // If the output is not an error, reset the cell's error count
+          // If the output is not an error, reset the cell's error count and clear timestamp
           if (cellErrorCounts.get(cellId) && cellErrorCounts.get(cellId)! > 0) {
             executionErrorCount -= cellErrorCounts.get(cellId)!;
             cellErrorCounts.set(cellId, 0);
+            lastErrorTimestamps.delete(cellId); // Reset last error timestamp
+            errorIntervals.delete(cellId); // Reset error interval
             console.log(
               `Cell ${cellId} executed successfully. Error count reset.`
             );
@@ -87,6 +107,15 @@ export function getExecutionErrorCount(): number {
  */
 export function getCellErrorCount(cellId: string): number {
   return cellErrorCounts.get(cellId) || 0;
+}
+
+/**
+ * Retrieves the time interval between the last two errors for a cell.
+ * @param cellId The ID of the cell.
+ * @returns The time interval in milliseconds, or null if unavailable.
+ */
+export function getErrorInterval(cellId: string): number | null {
+  return errorIntervals.get(cellId) || null;
 }
 
 /**

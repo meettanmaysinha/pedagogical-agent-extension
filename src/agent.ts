@@ -5,7 +5,7 @@ import { CodeCell, MarkdownCell, Cell } from '@jupyterlab/cells';
 import { AgentContent, ContentType } from './content';
 import { MyIcons } from './icons';
 import axios from 'axios';
-import { getCellErrorCount } from './errorTracker';
+import { getCellErrorCount, getErrorInterval } from './errorTracker';
 
 /**
  * Class that implements the Agent state where the AgentContent is empty
@@ -152,32 +152,72 @@ export class Agent implements IDisposable {
    * @param message Content of message
    */
   queryResponse = async (content: string) => {
-    // TODO: Implement LLM connection
     console.log('Querying...');
     const agentAPIEndPoint = 'http://localhost:8000/api/chat';
+    let errorInfo = 'No error log available';
+    let helpLevel = 'default'; // Default help level
+    // let errorInterval = 'No record of previous error timestamp';
+    const helpLevelMap = ['default', 'hint', 'guided', 'comprehensive'];
 
     // Append error count to message, if available
     if (this.currentCellMetadata !== null) {
-      content += ` \n\n\nContext: \nError count: ${this.currentCellMetadata.error_count}`;
-      if (this.currentCellMetadata.outputs !== null) {
-        // Find the first error output (if any)
-        const errorOutput = this.currentCellMetadata.outputs.find(
-          (output: any) => output.output_type === 'error'
+      // Only process as error if error_count exists and is greater than 0
+      if (
+        this.currentCellMetadata.error_count &&
+        this.currentCellMetadata.error_count > 0
+      ) {
+        const errorCount = this.currentCellMetadata.error_count;
+        const errorIntervalSeconds = Math.round(
+          this.currentCellMetadata.error_interval / 1000
         );
 
-        if (errorOutput) {
-          const errorName = errorOutput.ename; // "ModuleNotFoundError"
-          const errorValue = errorOutput.evalue; // "No module named 'pandas'"
+        let helpLevelNum = 0;
+        // Determine help level based on error count
+        if (errorCount >= 5) {
+          helpLevelNum = 3; // Provide detailed solution
+        } else if (errorCount >= 3) {
+          helpLevelNum = 2; // Provide clearer guidance
+        } else if (errorCount >= 1) {
+          helpLevelNum = 1; // Just give hints
+        }
+        console.log(`Current help level: ${helpLevelMap[helpLevelNum]}`);
+        //  If less than 2 minutes since last error, lower help level
+        if (errorIntervalSeconds < 120) {
+          helpLevelNum = Math.max(1, helpLevelNum - 1); // Lower by one level
+        }
+        console.log(`New help level: ${helpLevelMap[helpLevelNum]}`);
 
-          content += ` \nError description: ${errorName}: ${errorValue}`;
+        // Convert help level number to string
+        helpLevel = helpLevelMap[helpLevelNum];
+
+        // errorInfo = `Error count: ${errorCount}`;
+
+        if (this.currentCellMetadata.outputs !== null) {
+          // Find the first error output (if any)
+          const errorOutput = this.currentCellMetadata.outputs.find(
+            (output: any) => output.output_type === 'error'
+          );
+          if (errorOutput) {
+            const errorName = errorOutput.ename;
+            const errorValue = errorOutput.evalue;
+            errorInfo = `${errorName}: ${errorValue}`;
+          }
         }
       }
     }
 
-    console.log(`Querying with: \n${content}`);
+    const payload = {
+      message_content: content,
+      error_info: errorInfo,
+      help_level: helpLevel
+    };
+
+    console.log(`Querying with: \n${JSON.stringify(payload)}`);
+
     const agentResponse = await axios.post(agentAPIEndPoint, {
-      message_content: content
+      payload: payload
     });
+
     console.log(agentResponse.data.response);
     return agentResponse.data.response;
   };
@@ -296,13 +336,15 @@ export class Agent implements IDisposable {
       // Get the error count for this cell
       const cellId = cell.model.id;
       const cellErrorCount = getCellErrorCount(cellId);
+      const cellErrorInterval = getErrorInterval(cellId);
 
       const extractedCellInfo = {
         id: cellInformation.id, // id of cell
         source: cellInformation.source, // Content inside the cell
         execution_count: cellInformation.execution_count, // Number of times cell was executed
         outputs: cellInformation.outputs, // Output information - Shows error details if cell has error
-        error_count: cellErrorCount // Number of errors so far in the cell
+        error_count: cellErrorCount, // Number of errors so far in the cell
+        error_interval: cellErrorInterval // Time interval between last two errors
       };
 
       // Store the current cell metadata
