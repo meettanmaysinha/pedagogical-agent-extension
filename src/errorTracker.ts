@@ -56,17 +56,17 @@ export function trackCellErrors(codeCell: CodeCell): void {
           const currentCellErrors = cellErrorCounts.get(cellId) || 0;
           cellErrorCounts.set(cellId, currentCellErrors + 1);
 
-          console.log(`Global Error Count: ${executionErrorCount}`);
-          console.log(
-            `Cell ${cellId} Error Count: ${cellErrorCounts.get(cellId)}`
-          );
-          console.log(
-            `Cell ${cellId} Time Since Last Error: ${
-              errorIntervals.has(cellId)
-                ? (errorIntervals.get(cellId)! / 1000).toFixed(2)
-                : 'not available'
-            } seconds`
-          );
+          // console.log(`Global Error Count: ${executionErrorCount}`);
+          // console.log(
+          //   `Cell ${cellId} Error Count: ${cellErrorCounts.get(cellId)}`
+          // );
+          // console.log(
+          //   `Cell ${cellId} Time Since Last Error: ${
+          //     errorIntervals.has(cellId)
+          //       ? (errorIntervals.get(cellId)! / 1000).toFixed(2)
+          //       : 'not available'
+          //   } seconds`
+          // );
 
           // Add UI indication (optional)
           codeCell.node.classList.add('has-execution-error');
@@ -115,7 +115,8 @@ export function getCellErrorCount(cellId: string): number {
  * @returns The time interval in milliseconds, or null if unavailable.
  */
 export function getErrorInterval(cellId: string): number | null {
-  return errorIntervals.get(cellId) || null;
+  const interval = errorIntervals.get(cellId);
+  return interval !== undefined ? interval / 1000 : null;
 }
 
 /**

@@ -20,7 +20,6 @@ export class Agent implements IDisposable {
   chatButton: HTMLButtonElement;
   doseReceiveDrop: boolean;
   static numDz = 0;
-  currentCellMetadata: any = null;
 
   constructor(agentContent: AgentContent) {
     console.log('Agent constructed');
@@ -152,72 +151,13 @@ export class Agent implements IDisposable {
    * @param message Content of message
    */
   queryResponse = async (content: string) => {
+    // TODO: Implement LLM connection
     console.log('Querying...');
     const agentAPIEndPoint = 'http://localhost:8000/api/chat';
-    let errorInfo = 'No error log available';
-    let helpLevel = 'default'; // Default help level
-    // let errorInterval = 'No record of previous error timestamp';
-    const helpLevelMap = ['default', 'hint', 'guided', 'comprehensive'];
-
-    // Append error count to message, if available
-    if (this.currentCellMetadata !== null) {
-      // Only process as error if error_count exists and is greater than 0
-      if (
-        this.currentCellMetadata.error_count &&
-        this.currentCellMetadata.error_count > 0
-      ) {
-        const errorCount = this.currentCellMetadata.error_count;
-        const errorIntervalSeconds = Math.round(
-          this.currentCellMetadata.error_interval / 1000
-        );
-
-        let helpLevelNum = 0;
-        // Determine help level based on error count
-        if (errorCount >= 5) {
-          helpLevelNum = 3; // Provide detailed solution
-        } else if (errorCount >= 3) {
-          helpLevelNum = 2; // Provide clearer guidance
-        } else if (errorCount >= 1) {
-          helpLevelNum = 1; // Just give hints
-        }
-        console.log(`Current help level: ${helpLevelMap[helpLevelNum]}`);
-        //  If less than 2 minutes since last error, lower help level
-        if (errorIntervalSeconds < 120) {
-          helpLevelNum = Math.max(1, helpLevelNum - 1); // Lower by one level
-        }
-        console.log(`New help level: ${helpLevelMap[helpLevelNum]}`);
-
-        // Convert help level number to string
-        helpLevel = helpLevelMap[helpLevelNum];
-
-        // errorInfo = `Error count: ${errorCount}`;
-
-        if (this.currentCellMetadata.outputs !== null) {
-          // Find the first error output (if any)
-          const errorOutput = this.currentCellMetadata.outputs.find(
-            (output: any) => output.output_type === 'error'
-          );
-          if (errorOutput) {
-            const errorName = errorOutput.ename;
-            const errorValue = errorOutput.evalue;
-            errorInfo = `${errorName}: ${errorValue}`;
-          }
-        }
-      }
-    }
-
-    const payload = {
-      message_content: content,
-      error_info: errorInfo,
-      help_level: helpLevel
-    };
-
-    console.log(`Querying with: \n${JSON.stringify(payload)}`);
 
     const agentResponse = await axios.post(agentAPIEndPoint, {
-      payload: payload
+      message_content: content
     });
-
     console.log(agentResponse.data.response);
     return agentResponse.data.response;
   };
@@ -232,24 +172,10 @@ export class Agent implements IDisposable {
       event.preventDefault(); // Prevent line break
       // Get the message from the input box and add to chat box
       const message = this.chatInput.value;
-
-      // Console logs for debug
-      // console.log(`Query: ${message}`);
-
-      // if (this.currentCellMetadata !== null) {
-      //   console.log(
-      //     `Current cell error count: ${this.currentCellMetadata.error_count}`
-      //   );
-      // }
-      // console.log(`Full log:${JSON.stringify(this.currentCellMetadata)}`);
-
       this.chatInput.value = '';
       this.chatInput.style.height = ''; // Return input box to original size
       this.addMessageHandler('user', message);
       this.chatBox.scrollTop = this.chatBox.scrollHeight; // Scroll to the bottom
-
-      // Reset metadata
-      this.currentCellMetadata = null;
     }
   };
 
@@ -260,24 +186,10 @@ export class Agent implements IDisposable {
   buttonClickHandler = (event: MouseEvent) => {
     // Get the message from the input box and add to chat box
     const message = this.chatInput.value;
-
-    // Console logs for debug
-    // console.log(`Query: ${message}`);
-
-    // if (this.currentCellMetadata !== null) {
-    //   console.log(
-    //     `Current cell error count: ${this.currentCellMetadata.error_count}`
-    //   );
-    //   console.log(`Full log:${JSON.stringify(this.currentCellMetadata)}`);
-    // }
-
     this.chatInput.value = '';
     this.chatInput.style.height = ''; // Return input box to original size
     this.addMessageHandler('user', message);
     this.chatBox.scrollTop = this.chatBox.scrollHeight; // Scroll to the bottom
-
-    // Reset metadata
-    this.currentCellMetadata = null;
   };
 
   /**
@@ -332,25 +244,21 @@ export class Agent implements IDisposable {
       //   cell = event.source.activeCell;
       //   const cellInformation = JSON.stringify(this.getDroppedCellInfo(event.source.activeCell));
       const cellInformation = cell.model.toJSON();
-
-      // Get the error count for this cell
       const cellId = cell.model.id;
-      const cellErrorCount = getCellErrorCount(cellId);
-      const cellErrorInterval = getErrorInterval(cellId);
+      const errorCount = getCellErrorCount(cellId);
+      const errorInterval = getErrorInterval(cellId);
 
       const extractedCellInfo = {
         id: cellInformation.id, // id of cell
         source: cellInformation.source, // Content inside the cell
         execution_count: cellInformation.execution_count, // Number of times cell was executed
         outputs: cellInformation.outputs, // Output information - Shows error details if cell has error
-        error_count: cellErrorCount, // Number of errors so far in the cell
-        error_interval: cellErrorInterval // Time interval between last two errors
+        error_count: errorCount, // Number of errors in the cell
+        error_interval: errorInterval // Time interval between last two errors
       };
-
-      // Store the current cell metadata
-      this.currentCellMetadata = extractedCellInfo;
-
       this.addCellMessageHandler(extractedCellInfo);
+      console.log('Extracted cell info');
+      console.log(extractedCellInfo);
     } else {
       //   cell = notebook.content.activeCell as MarkdownCell;
       //   cellContentType = ContentType.Markdown;
