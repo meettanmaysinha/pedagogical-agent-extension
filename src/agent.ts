@@ -20,6 +20,7 @@ export class Agent implements IDisposable {
   chatButton: HTMLButtonElement;
   doseReceiveDrop: boolean;
   static numDz = 0;
+  currentCellMetadata: any = null;
 
   constructor(agentContent: AgentContent) {
     console.log('Agent constructed');
@@ -76,12 +77,24 @@ export class Agent implements IDisposable {
 
     this.chatInput = document.createElement('textarea') as HTMLTextAreaElement;
     this.chatInput.classList.add('agent-chat-input');
+
+    this.chatInput.style.minHeight = '50px';
+    this.chatInput.rows = 3;
+
     chatContainer.append(this.chatInput);
 
     // Auto resize textarea based on content
     this.chatInput.addEventListener('input', function () {
       this.style.height = 'auto';
       this.style.height = this.scrollHeight + 'px';
+    });
+
+    // Handle drag-drop resizing issue
+    this.chatInput.addEventListener('drop', function () {
+      setTimeout(() => {
+        this.style.height = 'auto';
+        this.style.height = this.scrollHeight + 'px';
+      }, 0);
     });
 
     this.chatButton = document.createElement('button') as HTMLButtonElement;
@@ -153,11 +166,22 @@ export class Agent implements IDisposable {
   queryResponse = async (content: string) => {
     // TODO: Implement LLM connection
     console.log('Querying...');
+
+    // Adding hint level to the message (if available)
+    if (this.currentCellMetadata != null) {
+      content += '\n\n\n';
+      content += 'help_level: ' + this.currentCellMetadata.help_level;
+      content += '\n';
+    }
+
+    console.log(content);
+
     const agentAPIEndPoint = 'http://localhost:8000/api/chat';
 
     const agentResponse = await axios.post(agentAPIEndPoint, {
       message_content: content
     });
+    this.currentCellMetadata = null;
     console.log(agentResponse.data.response);
     return agentResponse.data.response;
   };
@@ -244,9 +268,29 @@ export class Agent implements IDisposable {
       //   cell = event.source.activeCell;
       //   const cellInformation = JSON.stringify(this.getDroppedCellInfo(event.source.activeCell));
       const cellInformation = cell.model.toJSON();
+
+      // Hint level based on error count and interval
+      // More errors == more help
+      // Lower interval between errors == less help
       const cellId = cell.model.id;
       const errorCount = getCellErrorCount(cellId);
       const errorInterval = getErrorInterval(cellId);
+
+      const helpLevelMap = ['hint', 'guided', 'comprehensive'];
+      let helpLevelIndex = 0;
+      if (errorCount > 5) {
+        helpLevelIndex = 2;
+      } else if (errorCount > 3) {
+        helpLevelIndex = 1;
+      } else if (errorCount > 1) {
+        helpLevelIndex = 0;
+      }
+
+      if (errorInterval) {
+        if (errorInterval < 120) {
+          helpLevelIndex = Math.max(helpLevelIndex - 1, 0);
+        }
+      }
 
       const extractedCellInfo = {
         id: cellInformation.id, // id of cell
@@ -254,11 +298,11 @@ export class Agent implements IDisposable {
         execution_count: cellInformation.execution_count, // Number of times cell was executed
         outputs: cellInformation.outputs, // Output information - Shows error details if cell has error
         error_count: errorCount, // Number of errors in the cell
-        error_interval: errorInterval // Time interval between last two errors
+        error_interval: errorInterval, // Time interval between last two errors
+        help_level: helpLevelMap[helpLevelIndex] // Help level based on error count and interval
       };
       this.addCellMessageHandler(extractedCellInfo);
-      console.log('Extracted cell info');
-      console.log(extractedCellInfo);
+      this.currentCellMetadata = extractedCellInfo;
     } else {
       //   cell = notebook.content.activeCell as MarkdownCell;
       //   cellContentType = ContentType.Markdown;
