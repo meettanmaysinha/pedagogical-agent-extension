@@ -5,7 +5,7 @@ import { CodeCell, MarkdownCell, Cell } from '@jupyterlab/cells';
 import { AgentContent, ContentType } from './content';
 import { MyIcons } from './icons';
 import axios from 'axios';
-
+import { getCellErrorCount, getErrorInterval } from './errorTracker';
 
 /**
  * Class that implements the Agent state where the AgentContent is empty
@@ -20,6 +20,7 @@ export class Agent implements IDisposable {
   chatButton: HTMLButtonElement;
   doseReceiveDrop: boolean;
   static numDz = 0;
+  currentCellMetadata: any = null;
 
   constructor(agentContent: AgentContent) {
     console.log('Agent constructed');
@@ -33,11 +34,10 @@ export class Agent implements IDisposable {
     // Add a chat box
     this.chatBox = document.createElement('span') as HTMLElement;
     this.chatBox.classList.add('agent-chat-box');
-  
+
     this.node.append(this.chatBox);
 
     this.doseReceiveDrop = false;
-
 
     if (this.node.getElementsByClassName('agent-chat-box').length === 0) {
       // Initialize the content
@@ -68,7 +68,7 @@ export class Agent implements IDisposable {
     // Add bottom container
     const bottomContainer = document.createElement('span');
     bottomContainer.classList.add('agent-bottom-container');
-    this.node.append(bottomContainer);
+    this.chatBox.append(bottomContainer);
 
     // Add a chat bar
     const chatContainer = document.createElement('div');
@@ -77,12 +77,24 @@ export class Agent implements IDisposable {
 
     this.chatInput = document.createElement('textarea') as HTMLTextAreaElement;
     this.chatInput.classList.add('agent-chat-input');
+
+    this.chatInput.style.minHeight = '50px';
+    this.chatInput.rows = 3;
+
     chatContainer.append(this.chatInput);
 
     // Auto resize textarea based on content
     this.chatInput.addEventListener('input', function () {
       this.style.height = 'auto';
       this.style.height = this.scrollHeight + 'px';
+    });
+
+    // Handle drag-drop resizing issue
+    this.chatInput.addEventListener('drop', function () {
+      setTimeout(() => {
+        this.style.height = 'auto';
+        this.style.height = this.scrollHeight + 'px';
+      }, 0);
     });
 
     this.chatButton = document.createElement('button') as HTMLButtonElement;
@@ -125,9 +137,9 @@ export class Agent implements IDisposable {
    * @param role Role of sender (user, assistant)
    * @param message Content of message
    */
-  addCellMessageHandler = async ( cellContent: any) => {
-    var newLine = ""
-    if (this.chatInput.value != "") newLine ="\n"
+  addCellMessageHandler = async (cellContent: any) => {
+    var newLine = '';
+    if (this.chatInput.value != '') newLine = '\n';
     this.chatInput.value += newLine + cellContent.source;
     this.chatInput.scrollTop = this.chatInput.scrollHeight;
   };
@@ -154,11 +166,23 @@ export class Agent implements IDisposable {
   queryResponse = async (content: string) => {
     // TODO: Implement LLM connection
     console.log('Querying...');
+
+    let help_level = 'default';
+    // Adding hint level to the message (if available)
+    if (this.currentCellMetadata != null) {
+      // content += '\n\n\n';
+      // content += 'help_level: ' + this.currentCellMetadata.help_level;
+      // content += '\n';
+      help_level = this.currentCellMetadata.help_level;
+    }
+
     const agentAPIEndPoint = 'http://localhost:8000/api/chat';
 
     const agentResponse = await axios.post(agentAPIEndPoint, {
-      message_content: content
+      message_content: content,
+      help_level: help_level
     });
+    this.currentCellMetadata = null;
     console.log(agentResponse.data.response);
     return agentResponse.data.response;
   };
@@ -245,13 +269,41 @@ export class Agent implements IDisposable {
       //   cell = event.source.activeCell;
       //   const cellInformation = JSON.stringify(this.getDroppedCellInfo(event.source.activeCell));
       const cellInformation = cell.model.toJSON();
+
+      // Hint level based on error count and interval
+      // More errors == more help
+      // Lower interval between errors == less help
+      const cellId = cell.model.id;
+      const errorCount = getCellErrorCount(cellId);
+      const errorInterval = getErrorInterval(cellId);
+
+      const helpLevelMap = ['hint', 'guided', 'comprehensive'];
+      let helpLevelIndex = 0;
+      if (errorCount > 5) {
+        helpLevelIndex = 2;
+      } else if (errorCount > 3) {
+        helpLevelIndex = 1;
+      } else if (errorCount > 1) {
+        helpLevelIndex = 0;
+      }
+
+      if (errorInterval) {
+        if (errorInterval < 120) {
+          helpLevelIndex = Math.max(helpLevelIndex - 1, 0);
+        }
+      }
+
       const extractedCellInfo = {
         id: cellInformation.id, // id of cell
         source: cellInformation.source, // Content inside the cell
         execution_count: cellInformation.execution_count, // Number of times cell was executed
-        outputs: cellInformation.outputs // Output information - Shows error details if cell has error
+        outputs: cellInformation.outputs, // Output information - Shows error details if cell has error
+        error_count: errorCount, // Number of errors in the cell
+        error_interval: errorInterval, // Time interval between last two errors
+        help_level: helpLevelMap[helpLevelIndex] // Help level based on error count and interval
       };
       this.addCellMessageHandler(extractedCellInfo);
+      this.currentCellMetadata = extractedCellInfo;
     } else {
       //   cell = notebook.content.activeCell as MarkdownCell;
       //   cellContentType = ContentType.Markdown;
