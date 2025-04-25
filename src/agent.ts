@@ -68,7 +68,7 @@ export class Agent implements IDisposable {
     // Add bottom container
     const bottomContainer = document.createElement('span');
     bottomContainer.classList.add('agent-bottom-container');
-    this.node.append(bottomContainer);
+    this.chatBox.append(bottomContainer);
 
     // Add a chat bar
     const chatContainer = document.createElement('div');
@@ -167,19 +167,20 @@ export class Agent implements IDisposable {
     // TODO: Implement LLM connection
     console.log('Querying...');
 
+    let help_level = 'default';
     // Adding hint level to the message (if available)
     if (this.currentCellMetadata != null) {
-      content += '\n\n\n';
-      content += 'help_level: ' + this.currentCellMetadata.help_level;
-      content += '\n';
+      // content += '\n\n\n';
+      // content += 'help_level: ' + this.currentCellMetadata.help_level;
+      // content += '\n';
+      help_level = this.currentCellMetadata.help_level;
     }
-
-    console.log(content);
 
     const agentAPIEndPoint = 'http://localhost:8000/api/chat';
 
     const agentResponse = await axios.post(agentAPIEndPoint, {
-      message_content: content
+      message_content: content,
+      help_level: help_level
     });
     this.currentCellMetadata = null;
     console.log(agentResponse.data.response);
