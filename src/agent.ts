@@ -56,15 +56,6 @@ export class Agent implements IDisposable {
       label.innerText = 'Ask me questions!';
       this.node.append(label);
     }
-    // else {
-    //   // // Add chat messages
-    //   // for (let i = 0; i < 10; i++) {
-    //   //   const chatMessage = document.createElement('div');
-    //   //   chatMessage.classList.add('chat-message');
-    //   //   chatMessage.innerText = `Chat Message ${i}`;
-    //   //   this.chatBox.append(chatMessage);
-    //   // }
-    // }
 
     // Add bottom container
     const bottomContainer = document.createElement('span');
@@ -118,24 +109,6 @@ export class Agent implements IDisposable {
 
     chatMessage.classList.add('chat-message');
 
-    // if (role === 'assistant') {
-    //   chatRole.classList.add('system-role');
-    //   chatMessage.classList.add('system-message'); // add role-specific class
-    //   chatRole.innerText = 'Assistant';
-    //   chatMessage.innerText = message;
-
-    //   // TODO: check if parser works as intended
-    //   // Parse the message to be displayed properly
-    //   const parsedMessage = await Promise.resolve(marked.parse(message));
-    //   chatMessage.innerHTML = parsedMessage;
-
-    //   this.chatBox.append(chatRole);
-    //   this.chatBox.append(chatMessage);
-
-    //   // Auto scroll to bottom after appending
-    //   this.chatBox.scrollTop = this.chatBox.scrollHeight;
-    //   // this.streamChat(message, 0, chatMessage); // To be implemented if using streaming
-    // }
     if (role === 'assistant') {
       chatRole.classList.add('system-role');
       chatMessage.classList.add('system-message');
@@ -211,21 +184,6 @@ export class Agent implements IDisposable {
     this.chatInput.value += newLine + cellContent.source;
     this.chatInput.scrollTop = this.chatInput.scrollHeight;
   };
-
-  // // Function to simulate streaming chat effect
-  // streamChat = (messages: string, index = 0, chatMessage: HTMLDivElement) => {
-  //   if (index < messages.length) {
-  //     chatMessage.innerText += messages[index];
-
-  //     // Automatically scroll to the bottom of the chat container
-  //     chatMessage.scrollTop = chatMessage.scrollHeight;
-
-  //     // Recursive call with a delay
-  //     setTimeout(() => {
-  //       this.streamChat(messages, index + 1, chatMessage);
-  //     }, 0.1); // Adjust the delay (in milliseconds) as needed
-  //   }
-  // };
 
   /**
    * Retrieves message from Agent's LLM
