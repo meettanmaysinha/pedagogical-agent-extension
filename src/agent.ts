@@ -6,6 +6,7 @@ import { AgentContent, ContentType } from './content';
 import { MyIcons } from './icons';
 import axios from 'axios';
 import { getCellErrorCount, getErrorInterval } from './errorTracker';
+import { marked } from 'marked';
 
 /**
  * Class that implements the Agent state where the AgentContent is empty
@@ -68,7 +69,7 @@ export class Agent implements IDisposable {
     // Add bottom container
     const bottomContainer = document.createElement('span');
     bottomContainer.classList.add('agent-bottom-container');
-    this.chatBox.append(bottomContainer);
+    this.node.append(bottomContainer);
 
     // Add a chat bar
     const chatContainer = document.createElement('div');
@@ -114,20 +115,87 @@ export class Agent implements IDisposable {
   addMessageHandler = async (role: string, message: string) => {
     const chatMessage = document.createElement('div');
     const chatRole = document.createElement('div');
+
     chatMessage.classList.add('chat-message');
+
+    // if (role === 'assistant') {
+    //   chatRole.classList.add('system-role');
+    //   chatMessage.classList.add('system-message'); // add role-specific class
+    //   chatRole.innerText = 'Assistant';
+    //   chatMessage.innerText = message;
+
+    //   // TODO: check if parser works as intended
+    //   // Parse the message to be displayed properly
+    //   const parsedMessage = await Promise.resolve(marked.parse(message));
+    //   chatMessage.innerHTML = parsedMessage;
+
+    //   this.chatBox.append(chatRole);
+    //   this.chatBox.append(chatMessage);
+
+    //   // Auto scroll to bottom after appending
+    //   this.chatBox.scrollTop = this.chatBox.scrollHeight;
+    //   // this.streamChat(message, 0, chatMessage); // To be implemented if using streaming
+    // }
     if (role === 'assistant') {
       chatRole.classList.add('system-role');
+      chatMessage.classList.add('system-message');
       chatRole.innerText = 'Assistant';
-      chatMessage.innerText = message;
+
+      // Initially set the message text to empty
+      chatMessage.innerText = '';
+
+      // First append the elements to the DOM
       this.chatBox.append(chatRole);
       this.chatBox.append(chatMessage);
-      // this.streamChat(message, 0, chatMessage); // To be implemented if using streaming
+
+      // Parse the message first so we have the HTML version ready
+      const parsedMessage = await Promise.resolve(marked.parse(message));
+
+      // Extract text content
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = parsedMessage;
+      const textContent = tempDiv.textContent || tempDiv.innerText || '';
+
+      // Create a buffer for faster updates
+      let displayText = '';
+      let chunkSize = 3; // Process multiple characters per update
+      let i = 0;
+
+      // Use requestAnimationFrame for smoother performance
+      const animateTyping = () => {
+        // Add a chunk of characters
+        const endIndex = Math.min(i + chunkSize, textContent.length);
+        displayText += textContent.substring(i, endIndex);
+        chatMessage.innerText = displayText;
+
+        i = endIndex;
+
+        // Only scroll occasionally to reduce layout calculations
+        if (i % 20 === 0 || i >= textContent.length) {
+          this.chatBox.scrollTop = this.chatBox.scrollHeight;
+        }
+
+        // Check if we're done
+        if (i < textContent.length) {
+          setTimeout(() => requestAnimationFrame(animateTyping), 15);
+        } else {
+          // Animation complete, set final formatted HTML
+          chatMessage.innerHTML = parsedMessage;
+          this.chatBox.scrollTop = this.chatBox.scrollHeight;
+        }
+      };
+
+      // Start the animation
+      requestAnimationFrame(animateTyping);
     } else if (role === 'user') {
       chatRole.classList.add('user-role');
+      chatMessage.classList.add('user-message'); // add role-specific class
       chatRole.innerText = 'You';
       chatMessage.innerText = message;
+
       this.chatBox.append(chatRole);
       this.chatBox.append(chatMessage);
+
       this.addMessageHandler('assistant', await this.queryResponse(message));
     }
   };
@@ -197,10 +265,12 @@ export class Agent implements IDisposable {
       event.preventDefault(); // Prevent line break
       // Get the message from the input box and add to chat box
       const message = this.chatInput.value;
-      this.chatInput.value = '';
-      this.chatInput.style.height = ''; // Return input box to original size
-      this.addMessageHandler('user', message);
-      this.chatBox.scrollTop = this.chatBox.scrollHeight; // Scroll to the bottom
+      if (message) {
+        this.chatInput.value = '';
+        this.chatInput.style.height = ''; // Return input box to original size
+        this.addMessageHandler('user', message);
+        this.chatBox.scrollTop = this.chatBox.scrollHeight; // Scroll to the bottom
+      }
     }
   };
 
@@ -211,10 +281,12 @@ export class Agent implements IDisposable {
   buttonClickHandler = (event: MouseEvent) => {
     // Get the message from the input box and add to chat box
     const message = this.chatInput.value;
-    this.chatInput.value = '';
-    this.chatInput.style.height = ''; // Return input box to original size
-    this.addMessageHandler('user', message);
-    this.chatBox.scrollTop = this.chatBox.scrollHeight; // Scroll to the bottom
+    if (message) {
+      this.chatInput.value = '';
+      this.chatInput.style.height = ''; // Return input box to original size
+      this.addMessageHandler('user', message);
+      this.chatBox.scrollTop = this.chatBox.scrollHeight; // Scroll to the bottom
+    }
   };
 
   /**
