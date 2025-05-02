@@ -194,16 +194,31 @@ export class Agent implements IDisposable {
     console.log('Querying...');
 
     let help_level = 'default';
+    let errorMessage = null;
+
     // Adding hint level to the message (if available)
     if (this.currentCellMetadata != null) {
       // content += '\n\n\n';
       // content += 'help_level: ' + this.currentCellMetadata.help_level;
       // content += '\n';
       help_level = this.currentCellMetadata.help_level;
+
+      // Check for error output. If applicable, add error message to the content
+      const outputs = this.currentCellMetadata.outputs;
+      if (Array.isArray(outputs)) {
+        const errorOutput = outputs.find(
+          output => output.output_type === 'error'
+        );
+        if (errorOutput) {
+          errorMessage = `${errorOutput.ename}: ${errorOutput.evalue}`;
+        }
+      }
     }
 
+    if (errorMessage) {
+      content += '\n\n' + errorMessage;
+    }
     const agentAPIEndPoint = 'http://localhost:8000/api/chat';
-
     const agentResponse = await axios.post(agentAPIEndPoint, {
       message_content: content,
       help_level: help_level
