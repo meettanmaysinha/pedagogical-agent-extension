@@ -69,6 +69,7 @@ export class Agent implements IDisposable {
 
     this.chatInput = document.createElement('textarea') as HTMLTextAreaElement;
     this.chatInput.classList.add('agent-chat-input');
+    this.chatInput.placeholder = 'Type your message here...';
 
     this.chatInput.style.minHeight = '50px';
     this.chatInput.rows = 3;
@@ -112,7 +113,7 @@ export class Agent implements IDisposable {
     if (role === 'assistant') {
       chatRole.classList.add('system-role');
       chatMessage.classList.add('system-message');
-      chatRole.innerText = 'Assistant';
+      chatRole.innerText = 'Learning Companion';
 
       // Initially set the message text to empty
       chatMessage.innerText = '';

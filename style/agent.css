@@ -30,17 +30,27 @@
   align-items: center;
   justify-content: center;
   height: 70px;
-  width: 80%;
+  width: 100%;
   gap: 5px;
 }
 
 .agent-bottom-container .button {
   display: flex;
-  border: 3px solid var(--jp-border-color2);
-  height: 22px;
+  /* border: 3px solid var(--jp-border-color2); */
+  border: 3px solid #636364;
+  height: 28px;
   align-self: center;
   margin-left: 5px;
   font-weight: bold;
+  color: #ffffff;
+  border-radius: 20%;
+  background-color: #636364;
+}
+
+.agent-bottom-container .button:hover {
+  /* background-color: #ffffff; */
+  color: #636364;
+  /* border: 3px solid var(--jp-border-color2); */
 }
 
 .agent-chat-container {
@@ -178,4 +188,9 @@
   border-radius: 4px;
   white-space: pre-wrap;
   word-wrap: break-word;
+}
+
+.agent-chat-input {
+  font-size: 16px;
+  line-height: 1vw;
 }

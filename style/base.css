@@ -13,8 +13,10 @@
 
   box-shadow: -1px 1px 3px hsla(0, 0%, 0%, 0.15),
     -1px 1px 20px hsla(0, 0%, 0%, 0.1);
-  width: 300px;
-  height: 300px;
+  /* width: 300px;
+  height: 300px; */
+  width: 25vw;
+  height: 25vw;
 
   display: flex;
   flex-direction: column;
@@ -80,7 +82,9 @@
 }
 
 .agent-content {
-  height: calc(100% - var(--main-container-header-height) - var(--content-tab-height));
+  height: calc(
+    100% - var(--main-container-header-height) - var(--content-tab-height)
+  );
   width: 100%;
   display: flex;
   flex-direction: column;
