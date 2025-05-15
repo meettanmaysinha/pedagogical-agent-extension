@@ -196,6 +196,8 @@ export class Agent implements IDisposable {
 
     let help_level = 'default';
     let errorMessage = null;
+    let reasoning =
+      'Help level set to default because no error count or interval was found';
 
     // Adding hint level to the message (if available)
     if (this.currentCellMetadata != null) {
@@ -203,6 +205,7 @@ export class Agent implements IDisposable {
       // content += 'help_level: ' + this.currentCellMetadata.help_level;
       // content += '\n';
       help_level = this.currentCellMetadata.help_level;
+      reasoning = this.currentCellMetadata.help_level_reasoning;
 
       // Check for error output. If applicable, add error message to the content
       const outputs = this.currentCellMetadata.outputs;
@@ -219,10 +222,13 @@ export class Agent implements IDisposable {
     if (errorMessage) {
       content += '\n\n' + errorMessage;
     }
+
+    console.log('Help level reasoning: ' + reasoning);
     const agentAPIEndPoint = 'http://localhost:8000/api/chat';
     const agentResponse = await axios.post(agentAPIEndPoint, {
       message_content: content,
-      help_level: help_level
+      help_level: help_level,
+      help_level_reasoning: reasoning
     });
     this.currentCellMetadata = null;
     console.log(agentResponse.data.response);
@@ -325,17 +331,27 @@ export class Agent implements IDisposable {
 
       const helpLevelMap = ['hint', 'guided', 'comprehensive'];
       let helpLevelIndex = 0;
+      let reasoning = '';
       if (errorCount > 5) {
         helpLevelIndex = 2;
+        reasoning =
+          'Help level set to comprehensive because error count is more than 5';
       } else if (errorCount > 3) {
         helpLevelIndex = 1;
-      } else if (errorCount > 1) {
+        reasoning =
+          'Help level set to guided because error count is more than 3 and less than 5';
+      } else {
         helpLevelIndex = 0;
+        reasoning = 'Help level set to hint because error count is less than 3';
       }
 
       if (errorInterval) {
         if (errorInterval < 120) {
-          helpLevelIndex = Math.max(helpLevelIndex - 1, 0);
+          // helpLevelIndex = Math.max(helpLevelIndex - 1, 0);
+          if (helpLevelIndex > 0) {
+            helpLevelIndex -= 1;
+            reasoning += `, but lowered to ${helpLevelMap[helpLevelIndex]} because error interval is less than 2 minutes`;
+          }
         }
       }
 
@@ -346,7 +362,8 @@ export class Agent implements IDisposable {
         outputs: cellInformation.outputs, // Output information - Shows error details if cell has error
         error_count: errorCount, // Number of errors in the cell
         error_interval: errorInterval, // Time interval between last two errors
-        help_level: helpLevelMap[helpLevelIndex] // Help level based on error count and interval
+        help_level: helpLevelMap[helpLevelIndex], // Help level based on error count and interval
+        help_level_reasoning: reasoning // Reasoning for help level
       };
       this.addCellMessageHandler(extractedCellInfo);
       this.currentCellMetadata = extractedCellInfo;
