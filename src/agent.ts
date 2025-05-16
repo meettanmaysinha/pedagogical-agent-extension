@@ -198,6 +198,7 @@ export class Agent implements IDisposable {
     let errorMessage = null;
     let reasoning =
       'Help level set to default because no error count or interval was found';
+    let dragAndDrop = false;
 
     // Adding hint level to the message (if available)
     if (this.currentCellMetadata != null) {
@@ -206,6 +207,7 @@ export class Agent implements IDisposable {
       // content += '\n';
       help_level = this.currentCellMetadata.help_level;
       reasoning = this.currentCellMetadata.help_level_reasoning;
+      dragAndDrop = this.currentCellMetadata.drag_and_drop;
 
       // Check for error output. If applicable, add error message to the content
       const outputs = this.currentCellMetadata.outputs;
@@ -223,14 +225,17 @@ export class Agent implements IDisposable {
       content += '\n\n' + errorMessage;
     }
 
-    console.log('Help level reasoning: ' + reasoning);
+    // console.log('Dragged and dropped? ' + dragAndDrop);
+    // console.log('Help level reasoning: ' + reasoning);
+
+    this.currentCellMetadata = null;
     const agentAPIEndPoint = 'http://localhost:8000/api/chat';
     const agentResponse = await axios.post(agentAPIEndPoint, {
       message_content: content,
       help_level: help_level,
-      help_level_reasoning: reasoning
+      help_level_reasoning: reasoning,
+      drag_and_drop: dragAndDrop
     });
-    this.currentCellMetadata = null;
     console.log(agentResponse.data.response);
     return agentResponse.data.response;
   };
@@ -363,7 +368,8 @@ export class Agent implements IDisposable {
         error_count: errorCount, // Number of errors in the cell
         error_interval: errorInterval, // Time interval between last two errors
         help_level: helpLevelMap[helpLevelIndex], // Help level based on error count and interval
-        help_level_reasoning: reasoning // Reasoning for help level
+        help_level_reasoning: reasoning, // Reasoning for help level
+        drag_and_drop: true // Flag to indicate that this is a drag and drop event
       };
       this.addCellMessageHandler(extractedCellInfo);
       this.currentCellMetadata = extractedCellInfo;
