@@ -69,6 +69,7 @@ export class Agent implements IDisposable {
 
     this.chatInput = document.createElement('textarea') as HTMLTextAreaElement;
     this.chatInput.classList.add('agent-chat-input');
+    this.chatInput.placeholder = 'Type your message here...';
 
     this.chatInput.style.minHeight = '50px';
     this.chatInput.rows = 3;
@@ -112,7 +113,7 @@ export class Agent implements IDisposable {
     if (role === 'assistant') {
       chatRole.classList.add('system-role');
       chatMessage.classList.add('system-message');
-      chatRole.innerText = 'Assistant';
+      chatRole.innerText = 'Learning Companion';
 
       // Initially set the message text to empty
       chatMessage.innerText = '';
@@ -195,6 +196,9 @@ export class Agent implements IDisposable {
 
     let help_level = 'default';
     let errorMessage = null;
+    let reasoning =
+      'Help level set to default because no error count or interval was found';
+    let dragAndDrop = false;
 
     // Adding hint level to the message (if available)
     if (this.currentCellMetadata != null) {
@@ -202,6 +206,8 @@ export class Agent implements IDisposable {
       // content += 'help_level: ' + this.currentCellMetadata.help_level;
       // content += '\n';
       help_level = this.currentCellMetadata.help_level;
+      reasoning = this.currentCellMetadata.help_level_reasoning;
+      dragAndDrop = this.currentCellMetadata.drag_and_drop;
 
       // Check for error output. If applicable, add error message to the content
       const outputs = this.currentCellMetadata.outputs;
@@ -218,12 +224,18 @@ export class Agent implements IDisposable {
     if (errorMessage) {
       content += '\n\n' + errorMessage;
     }
+
+    // console.log('Dragged and dropped? ' + dragAndDrop);
+    // console.log('Help level reasoning: ' + reasoning);
+
+    this.currentCellMetadata = null;
     const agentAPIEndPoint = 'http://localhost:8000/api/chat';
     const agentResponse = await axios.post(agentAPIEndPoint, {
       message_content: content,
-      help_level: help_level
+      help_level: help_level,
+      help_level_reasoning: reasoning,
+      drag_and_drop: dragAndDrop
     });
-    this.currentCellMetadata = null;
     console.log(agentResponse.data.response);
     return agentResponse.data.response;
   };
@@ -324,17 +336,27 @@ export class Agent implements IDisposable {
 
       const helpLevelMap = ['hint', 'guided', 'comprehensive'];
       let helpLevelIndex = 0;
+      let reasoning = '';
       if (errorCount > 5) {
         helpLevelIndex = 2;
+        reasoning =
+          'Help level set to comprehensive because error count is more than 5';
       } else if (errorCount > 3) {
         helpLevelIndex = 1;
-      } else if (errorCount > 1) {
+        reasoning =
+          'Help level set to guided because error count is more than 3 and less than 5';
+      } else {
         helpLevelIndex = 0;
+        reasoning = 'Help level set to hint because error count is less than 3';
       }
 
       if (errorInterval) {
         if (errorInterval < 120) {
-          helpLevelIndex = Math.max(helpLevelIndex - 1, 0);
+          // helpLevelIndex = Math.max(helpLevelIndex - 1, 0);
+          if (helpLevelIndex > 0) {
+            helpLevelIndex -= 1;
+            reasoning += `, but lowered to ${helpLevelMap[helpLevelIndex]} because error interval is less than 2 minutes`;
+          }
         }
       }
 
@@ -345,7 +367,9 @@ export class Agent implements IDisposable {
         outputs: cellInformation.outputs, // Output information - Shows error details if cell has error
         error_count: errorCount, // Number of errors in the cell
         error_interval: errorInterval, // Time interval between last two errors
-        help_level: helpLevelMap[helpLevelIndex] // Help level based on error count and interval
+        help_level: helpLevelMap[helpLevelIndex], // Help level based on error count and interval
+        help_level_reasoning: reasoning, // Reasoning for help level
+        drag_and_drop: true // Flag to indicate that this is a drag and drop event
       };
       this.addCellMessageHandler(extractedCellInfo);
       this.currentCellMetadata = extractedCellInfo;
