@@ -69,7 +69,7 @@ export class Agent implements IDisposable {
 
     this.chatInput = document.createElement('textarea') as HTMLTextAreaElement;
     this.chatInput.classList.add('agent-chat-input');
-    this.chatInput.placeholder = 'Type your message here...';
+    this.chatInput.placeholder = 'Type your message here.......';
 
     this.chatInput.style.minHeight = '50px';
     this.chatInput.rows = 3;
@@ -94,7 +94,7 @@ export class Agent implements IDisposable {
     this.chatButton.classList.add('agent-button', 'button');
     bottomContainer.append(this.chatButton);
     this.chatButton.type = 'button';
-    this.chatButton.innerText = 'Send';
+    this.chatButton.innerText = 'Senddd';
     this.chatButton.addEventListener('click', this.buttonClickHandler);
     this.chatInput.addEventListener('keydown', this.enterKeyHandler);
   }
