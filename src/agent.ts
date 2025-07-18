@@ -5,7 +5,7 @@ import { CodeCell, MarkdownCell, Cell } from '@jupyterlab/cells';
 import { AgentContent, ContentType } from './content';
 import { MyIcons } from './icons';
 import axios from 'axios';
-import { getCellErrorCount, getErrorInterval } from './errorTracker';
+import { getCellErrorCount, getErrorInterval, resetCellErrorCount } from './errorTracker';
 import { marked } from 'marked';
 
 /**
@@ -69,7 +69,7 @@ export class Agent implements IDisposable {
 
     this.chatInput = document.createElement('textarea') as HTMLTextAreaElement;
     this.chatInput.classList.add('agent-chat-input');
-    this.chatInput.placeholder = 'Type your message here...';
+    this.chatInput.placeholder = 'Type your message here......';
 
     this.chatInput.style.minHeight = '50px';
     this.chatInput.rows = 3;
@@ -228,17 +228,26 @@ export class Agent implements IDisposable {
     // console.log('Dragged and dropped? ' + dragAndDrop);
     // console.log('Help level reasoning: ' + reasoning);
 
-    this.currentCellMetadata = null;
+
     const agentAPIEndPoint = 'http://localhost:8000/api/chat';
     const agentResponse = await axios.post(agentAPIEndPoint, {
       message_content: content,
       help_level: help_level,
       help_level_reasoning: reasoning,
+      execution_count: this.currentCellMetadata?.execution_count || null,
+      outputs: this.currentCellMetadata?.outputs || null,
+      error_count: this.currentCellMetadata?.error_count || null,
+      error_interval: this.currentCellMetadata?.error_interval || null,
       drag_and_drop: dragAndDrop
     });
+
+
     console.log(agentResponse.data.response);
+    this.currentCellMetadata = null;
     return agentResponse.data.response;
   };
+    
+  
 
   /**
    * Handle keyboard enter in the chat input
@@ -331,7 +340,22 @@ export class Agent implements IDisposable {
       // More errors == more help
       // Lower interval between errors == less help
       const cellId = cell.model.id;
-      const errorCount = getCellErrorCount(cellId);
+      // const errorCount = getCellErrorCount(cellId);
+      
+
+      let errorCount = getCellErrorCount(cellId);
+
+      const hasError = Array.isArray(cellInformation.outputs)
+        ? (cellInformation.outputs as any[]).some(
+            output => output.output_type === 'error'
+          )
+        : false;
+
+      if (!hasError) {
+        resetCellErrorCount(cellId);
+        errorCount = 0;
+      }
+
       const errorInterval = getErrorInterval(cellId);
 
       const helpLevelMap = ['hint', 'guided', 'comprehensive'];
@@ -351,7 +375,7 @@ export class Agent implements IDisposable {
       }
 
       if (errorInterval) {
-        if (errorInterval < 120) {
+        if (errorInterval < 60) {
           // helpLevelIndex = Math.max(helpLevelIndex - 1, 0);
           if (helpLevelIndex > 0) {
             helpLevelIndex -= 1;
