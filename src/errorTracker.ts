@@ -126,3 +126,16 @@ export function getErrorInterval(cellId: string): number | null {
 export function getAllCellErrorCounts(): Map<string, number> {
   return new Map(cellErrorCounts);
 }
+
+/**
+ * Resets the error count and error interval for a specific cell.
+ * @param cellId The ID of the cell.
+ */
+export function resetCellErrorCount(cellId: string): void {
+    if (cellErrorCounts.has(cellId)) {
+      executionErrorCount -= cellErrorCounts.get(cellId)!;
+      cellErrorCounts.set(cellId, 0);
+    }
+    lastErrorTimestamps.delete(cellId);
+    errorIntervals.delete(cellId);
+  }
