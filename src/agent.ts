@@ -94,7 +94,7 @@ export class Agent implements IDisposable {
     this.chatButton.classList.add('agent-button', 'button');
     bottomContainer.append(this.chatButton);
     this.chatButton.type = 'button';
-    this.chatButton.innerText = 'Send';
+    this.chatButton.innerText = 'Senddd';
     this.chatButton.addEventListener('click', this.buttonClickHandler);
     this.chatInput.addEventListener('keydown', this.enterKeyHandler);
   }
