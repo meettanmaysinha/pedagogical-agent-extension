@@ -1,4 +1,4 @@
-# URECA Pedagogical Agent Extension
+# Pedagogical Agent Extension
 ### Made for Jupyter Lab
 
 ## Introduction
