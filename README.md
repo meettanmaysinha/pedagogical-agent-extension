@@ -1,6 +1,12 @@
 # Pedagogical Agent Extension
 ### Made for Jupyter Lab
 
+## Citation
+
+If you use this software in your research and/or teaching, please cite: 
+
+Sinha, T., Huang, R., Prasadh, G.R. (2026). Scaffolding Emotion Regulation in Productive Failure Using an AIED System – Prototyping and Evaluation. In: Blanchard, E.G., Chen, G., Chi, M., Isotani, S. (eds) Artificial Intelligence in Education. Late Breaking Results, WideAIED, Practitioners, Industry and Policies, Blue Sky, Doctoral Consortium, FoL Workshops and Tutorials, FoL Invited Papers. AIED 2026. Communications in Computer and Information Science, vol 3032. Springer, Cham. https://doi.org/10.1007/978-3-032-29791-4_2
+
 ## Introduction
 
 This is a Jupyter Lab Extension for the Pedagogical Agent (PA), providing a user interface for a student to interact with the agent. This documentation is your comprehensive guide to understanding the components of this extension.
