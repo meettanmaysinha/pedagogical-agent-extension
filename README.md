@@ -1,5 +1,4 @@
-# Pedagogical Agent Extension
-### Made for Jupyter Lab
+# Pedagogical Agent Extension (made for Jupyter Lab)
 
 ## Citation
 
